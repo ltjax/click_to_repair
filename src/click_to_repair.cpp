@@ -98,6 +98,15 @@ private:
     float mDurability = 1.f;
 };
 
+OEntityRef createGear()
+{
+    auto gear = OEntity::create();
+    gear->addComponent<MachineSize>();
+    gear->addComponent<GearComponent>();
+    gear->addComponent<DurabilityComponent>();
+    return gear;
+}
+
 void initSettings()
 {
     oSettings->setGameName("Click to repair!");
@@ -106,11 +115,9 @@ void initSettings()
 void init()
 {
     oContentManager->addSearchPath("../../../../assets");
-    auto gear = OEntity::create();
-    gear->addComponent<MachineSize>();
-    gear->addComponent<GearComponent>();
-    gear->addComponent<DurabilityComponent>();
-    gear->setLocalTransform(Matrix::CreateTranslation(OScreenCenterf / 2.0f));
+    
+    createGear()->setLocalTransform(Matrix::CreateTranslation(OScreenCenterf / 2.0f));
+    createGear()->setLocalTransform(Matrix::CreateTranslation(OScreenCenterf + OScreenCenterf / 2.0f));
 }
 
 void update()
