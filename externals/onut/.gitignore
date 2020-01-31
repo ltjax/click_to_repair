@@ -48,11 +48,6 @@ CMakeFiles/
 bin/
 lib/
 
-# cmake
-CMakeCache.txt
-*.cmake
-Makefile
-
 # apple
 .DS_Store
 
