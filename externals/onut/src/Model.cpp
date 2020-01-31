@@ -96,7 +96,7 @@ namespace onut
 
             aiString texturePath;
             auto ret = pAssMat->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &texturePath);
-#if 0
+#if 1
             if (ret == aiReturn_SUCCESS)
             {
                 if (auto texture = pScene->GetEmbeddedTexture(texturePath.C_Str()))

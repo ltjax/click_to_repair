@@ -407,7 +407,7 @@ endif()
 #set(ASSIMP_BUILD_TESTS OFF)
 #set(BUILD_SHARED_LIBS OFF)
 #add_subdirectory(./thirdparty/assimp/)
-list(APPEND libs assimp)
+list(APPEND libs CONAN_PKG::assimp)
 
 # Include libs and includes
 target_include_directories(libonut ${includes})
