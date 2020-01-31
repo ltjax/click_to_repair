@@ -1,0 +1,15 @@
+// Shader input. These cannot be anything different for spritebatch calls
+input float2 inUV;
+input float4 inColor;
+
+// Texture
+Texture0 texture0;
+
+const float4 colorMul = float4(2.0, .23, 0.25, 1.0);
+
+void main()
+{
+    float4 color0 = texture0(inUV);
+
+    oColor = saturate(color0 * inColor * colorMul);
+}

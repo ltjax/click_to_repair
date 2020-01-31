@@ -1,0 +1,2 @@
+gameName=Javascript UI Navigation Sample
+fullscreen=true

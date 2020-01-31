@@ -1,0 +1,10 @@
+resolution=800x600
+retroResolution=256x160
+retroMode=true
+gameName=Dungeon
+resizableWindow=false
+fullscreen=true
+fixedStep=false
+appId=0
+appSecret=0
+onScreenLog=false
