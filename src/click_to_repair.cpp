@@ -17,6 +17,17 @@ class MachineSize : public OComponent
 {
 public:
     float size = 128.f;
+
+    Rect getBoundingBox() const
+    {
+        auto transform = getEntity()->getWorldTransform();
+        
+        auto p = Vector4::Transform(Vector4{0.f, 0.f, 0.f, 1.f}, transform);
+        
+        auto size = getComponent<MachineSize>()->size;
+        auto halfSize = size * 0.5f;
+        return Rect{-halfSize + p.x, -halfSize + p.y, size, size};
+    }
 };
 
 class GearComponent : public OComponent
@@ -72,7 +83,8 @@ private:
     
     void onUpdate() override
     {
-        if (OInputPressed(OMouse1))
+        // oInput->mousePosf
+        if (OInputPressed(OMouse1) && getComponent<MachineSize>()->getBoundingBox().Contains(oInput->mousePosf))
         {
             mDurability = min(1.f, mDurability + ODT * 0.15f);
         }
