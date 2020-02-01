@@ -10,9 +10,9 @@ class ClickToRepairConan(ConanFile):
             # Please install glew and SDL2 from system libraries
             # e.g. 
             #   sudo apt-get install libglew-dev libsdl2-dev
-            requirements = ["assimp/5.0.1","entt/3.2.2"]
+            requirements = ["assimp/5.0.1","entt/3.2.2", "nlohmann_json/3.7.3" ]
         else:
-            requirements = ["assimp/5.0.1", "entt/3.2.2",
+            requirements = ["assimp/5.0.1", "entt/3.2.2", "nlohmann_json/3.7.3",
                 "glew/2.1.0@bincrafters/stable","sdl2/2.0.10@bincrafters/stable"]
 
         for x in requirements:
