@@ -6,6 +6,7 @@
 #include "Constants.hpp"
 #include <onut/Sound.h>
 #include <random>
+#include <onut/Renderer.h>
 
 void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 {
@@ -77,7 +78,7 @@ void updateWear(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
-void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt)
+void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt, Matrix const& camera)
 {
     auto view = registry.view<Machine, HoverState>();
     for (auto entity : view)
@@ -85,7 +86,7 @@ void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt
         auto const& machine = view.get<Machine>(entity);
         auto& hoverState = view.get<HoverState>(entity);
         bool oldState = hoverState.containsMouse;
-        hoverState.containsMouse = machine.getBoundingBox().Contains(oInput->mousePosf);
+        hoverState.containsMouse = machine.getBoundingBox(camera).Contains(oInput->mousePosf);
         if (oldState == hoverState.containsMouse) {
             if (hoverState.containsMouse == false)
             {
@@ -261,8 +262,10 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
+    level.camera = Matrix::CreateTranslation(OScreenf / 2.f);
+
     auto& registry = level.entities;
-    updateHoverStates(registry, dt);
+    updateHoverStates(registry, dt, level.camera);
     updateHoverSounds(registry);
     updateGears(registry, dt);
     updateEngines(registry, dt);
