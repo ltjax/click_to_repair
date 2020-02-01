@@ -20,13 +20,14 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Durability, Machine>();
+    auto view = registry.view<Durability, Machine, HoverState>();
     state.started_repairing = false;
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
         auto& durability = view.get<Durability>(entity).durability;
-        if (OInputPressed(OMouse1) && machine.getBoundingBox().Contains(oInput->mousePosf))
+        auto const& containsMouse = view.get<HoverState>(entity).containsMouse;
+        if (OInputPressed(OMouse1) && containsMouse)
         {
             auto speed = state.repairium > 0.f ? 
                 Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE : 
@@ -44,6 +45,66 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
         {
             durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
             state.is_repairing = false;
+        }
+    }
+}
+
+void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt)
+{
+    auto view = registry.view<Machine, HoverState>();
+    for (auto entity : view)
+    {
+        auto const& machine = view.get<Machine>(entity);
+        auto& hoverState = view.get<HoverState>(entity);
+        bool oldState = hoverState.containsMouse;
+        hoverState.containsMouse = machine.getBoundingBox().Contains(oInput->mousePosf);
+        if (oldState == hoverState.containsMouse) {
+            if (hoverState.containsMouse == false)
+            {
+                hoverState.timeOut += dt;
+            }
+            else
+            {
+                hoverState.timeIn += dt;
+            }
+        }
+        else
+        {
+            if (hoverState.containsMouse == false)
+            {
+                hoverState.timeOut = std::chrono::duration<float>::zero();
+                hoverState.timeIn = std::chrono::duration<float>::zero() + dt;
+            }
+            else
+            {
+                hoverState.timeOut = std::chrono::duration<float>::zero() + dt;
+                hoverState.timeIn = std::chrono::duration<float>::zero();
+            }
+        }
+    }
+}
+
+void updateHoverSounds(entt::registry& registry)
+{
+    auto view = registry.view<HoverState, HoverSound>();
+    for (auto entity : view)
+    {
+        auto const hoverState = view.get<HoverState>(entity);
+        auto const& hoverSound = view.get<HoverSound>(entity);
+        if (hoverState.containsMouse && !hoverSound.background->isPlaying())
+        {
+            hoverSound.background->setLoop(true);
+            hoverSound.background->setVolume(1.f);
+            hoverSound.background->play();
+        }
+        if (!hoverState.containsMouse && hoverSound.background->isPlaying())
+        {
+            auto newVolume = 1.f - std::clamp(hoverState.timeOut.count(), 0.f, 1.f);
+            hoverSound.background->setVolume(newVolume);
+            if (hoverState.timeOut.count() > 1.f)
+            {
+                hoverSound.background->stop();
+            }
         }
     }
 }
@@ -141,6 +202,8 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
     auto& registry = level.entities;
+    updateHoverStates(registry, dt);
+    updateHoverSounds(registry);
     updateGears(registry, dt);
     updateDurability(level, dt);
     updateQuality(level, dt);

@@ -2,6 +2,7 @@
 #include <onut/Vector2.h>
 #include <onut/Vector4.h>
 #include <onut/Matrix.h>
+#include <onut/Sound.h>
 
 struct Durability
 {
@@ -24,4 +25,16 @@ struct Machine
 struct Gear
 {
     Matrix rotation;
+};
+
+struct HoverState
+{
+    bool containsMouse = false;
+    std::chrono::duration<float> timeIn = std::chrono::duration<float>::zero();
+    std::chrono::duration<float> timeOut = std::chrono::duration<float>::zero();
+};
+
+struct HoverSound
+{
+    OSoundInstanceRef background;
 };
