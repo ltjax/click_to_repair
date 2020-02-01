@@ -169,20 +169,44 @@ Quality computeQuality(float durability, float lower, float upper)
     return Quality::Medium;
 }
 
+
+Quality minQuality(Quality first, Quality second)
+{
+    switch (first) 
+    {
+        case Quality::Good:
+            return second;
+
+        case Quality::Worst:
+            return Quality::Worst;
+
+        case Quality::Medium:
+            if (second==Quality::Worst)
+            {
+                return Quality::Worst;
+            }
+            else
+            {
+                return Quality::Medium;
+            }
+    }
+
+    return Quality::Worst;
+}
+
 void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Durability>();
+    auto view = registry.view<Quality>();
 
-    float min_durability = 1.f;
+    state.quality = Quality::Good;
     for (auto entity : view)
     {
-        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<Quality>(entity);
 
-        min_durability = std::min(min_durability, durability);
+        state.quality = minQuality(state.quality, quality);
     }
 
-    state.quality = computeQuality(min_durability, 0.1, 0.8);
 }
 
 void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
