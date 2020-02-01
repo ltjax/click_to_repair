@@ -5,10 +5,10 @@
 class Updater
 {
 public:
-    Updater(GameState& state_) : state(state_) {}
+    Updater(GameState& state) : state_(state) {}
 
     void run(std::chrono::duration<float> dt);
 
 private:
-    GameState& state;
+    GameState& state_;
 };

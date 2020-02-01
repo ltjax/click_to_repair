@@ -70,11 +70,11 @@ void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 
 void Updater::run(std::chrono::duration<float> dt)
 {
-    auto& registry = state.entities;
+    auto& registry = state_.entities;
     updateGears(registry, dt);
-    updateDuration(state, dt);
-    updateQuality(state, dt);
-    updateRepairum(state, dt);
+    updateDuration(state_, dt);
+    updateQuality(state_, dt);
+    updateRepairum(state_, dt);
     
     if (OInputJustPressed(OKeyEscape))
         OQuit();
