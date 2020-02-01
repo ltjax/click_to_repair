@@ -20,6 +20,8 @@ entt::entity createEngine(entt::registry& registry, Vector2 position)
   registry.assign<Machine>(engine, position, 128.f);
   registry.assign<Engine>(engine);
   registry.assign<Durability>(engine, 1.f);
+  registry.assign<HoverState>(engine);
+  registry.assign<HoverSound>(engine, OCreateSoundInstance("ambient_machine1.wav"));
   return engine;
 }
 
