@@ -34,6 +34,7 @@ void init()
 {
     oContentManager->addSearchPath("../../../../assets");
     gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.progress); // TODO: restore progress from save file?
+    gameState.progress.load();
 }
 
 void update()

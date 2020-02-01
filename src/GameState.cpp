@@ -1,28 +1,34 @@
 #include "GameState.hpp"
-#include "MainMenuScreen.hpp"
-#include "WinScreen.hpp"
-#include <onut/Input.h>
-#include <onut/onut.h>
-#include "InGameScreen.hpp"
+#include <onut/Files.h>
+#include <nlohmann/json.hpp>
 
-//void setup_level(IngameScreen& state, int level);
-//void advance_level(IngameScreen& state);
-//void win_level(IngameScreen& state);
-//
-//
-//void advance_level(IngameScreen& state)
-//{
-//    auto next_level_index = state.level_index + 1;
-//    if (next_level_index >= MAX_LEVEL) {
-//        state.menu_state = MenuState{};
-//    }
-//    else
-//        setup_level(state, next_level);
-//}
+namespace {
+  constexpr auto save_file = "savegame.json";
+  constexpr auto key_next_level = "next_level";
+}
 
-//void win_level(IngameScreen& state)
-//{
-//    // TODO: first show win screen
-//    advance_level(state);
-//}
+void Progress::load()
+{
+  *this = {}; // reset to defaults just in case
 
+  if (onut::fileExists(save_file))
+  {
+    try
+    {
+      auto json = nlohmann::json::parse(onut::getFileData(save_file));
+      if (json.contains(key_next_level))
+        next_available_level = json.at(key_next_level);
+    }
+    catch (...)
+    {
+      // just ignore errors - too bad you save is gone :p
+    }
+  }
+}
+
+void Progress::save()
+{
+  nlohmann::json out;
+  out[key_next_level] = next_available_level;
+  onut::createTextFile(save_file, out.dump());
+}

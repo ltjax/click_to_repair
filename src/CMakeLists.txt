@@ -26,6 +26,7 @@ add_executable(${TARGET_NAME} WIN32
 target_link_libraries(${TARGET_NAME} 
     PUBLIC libonut
     PUBLIC CONAN_PKG::entt
+    PUBLIC CONAN_PKG::nlohmann_json
 )
 
 target_compile_definitions(${TARGET_NAME}
