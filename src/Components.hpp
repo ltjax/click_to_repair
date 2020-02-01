@@ -32,7 +32,8 @@ struct Gear
 
 struct Engine
 {
-  float cam_shaft_angle = 0.f;
+    float camShaftAngle = 0.f;
+    float shake = 1.f;
 };
 
 struct HoverState
@@ -53,3 +54,7 @@ struct QualityStatus
     Quality current;
 };
 
+struct Hamster 
+{
+  float delta = 0.f;
+};

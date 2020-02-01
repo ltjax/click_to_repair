@@ -4,7 +4,7 @@
 
 struct Progress
 {
-  int next_available_level = 0;
+  int next_available_level = 100;
 };
 
 struct GameState
