@@ -4,7 +4,7 @@
 #include <onut/Renderer.h>
 #include <onut/SpriteBatch.h>
 #include "Constants.hpp"
-#include "GameState.hpp"
+#include "MainMenuScreen.hpp"
 
 WinScreen::WinScreen()
 {

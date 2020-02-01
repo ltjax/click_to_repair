@@ -19,6 +19,8 @@ add_executable(${TARGET_NAME} WIN32
   InGameScreen.hpp
   WinScreen.cpp
   WinScreen.hpp
+  MainMenuScreen.cpp
+  MainMenuScreen.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 

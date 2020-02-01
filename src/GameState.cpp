@@ -1,27 +1,9 @@
 #include "GameState.hpp"
+#include "MainMenuScreen.hpp"
+#include "WinScreen.hpp"
 #include <onut/Input.h>
 #include <onut/onut.h>
-#include "WinScreen.hpp"
 #include "InGameScreen.hpp"
-
-std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
-{
-    if (OInputJustPressed(OKeyEscape))
-    {
-        OQuit();
-        return nullptr;
-    }
-
-    if (OInputPressed(OMouse1))
-        return std::make_unique<InGameScreen>();
-
-    return nullptr;
-}
-
-void MainMenuScreen::render()
-{
-    // TODO: render something...
-}
 
 //void setup_level(IngameScreen& state, int level);
 //void advance_level(IngameScreen& state);

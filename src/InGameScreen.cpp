@@ -1,5 +1,5 @@
 #include "InGameScreen.hpp"
-#include "GameState.hpp"
+#include "MainMenuScreen.hpp"
 #include "WinScreen.hpp"
 #include <onut/Input.h>
 
