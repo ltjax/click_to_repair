@@ -31,10 +31,17 @@ void level1(entt::registry& registry, LevelData& state)
     createGear(registry, OScreenCenterf + Vector2(200, 0));
 }
 
+void level2(entt::registry& registry, LevelData& state)
+{
+    createGear(registry, OScreenCenterf);
+    createEngine(registry, OScreenCenterf + Vector2(200, 0));
+}
+
 using LevelFunc = void (*)(entt::registry&, LevelData&);
 LevelFunc levels[] = {
     level0,
     level1,
+    level2,
 };
 constexpr auto MAX_LEVEL = sizeof(levels) / sizeof(levels[0]);
 

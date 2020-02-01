@@ -20,12 +20,12 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 
 void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
 {
-  auto view = registry.view<Engine>();
-  for (auto entity : view)
-  {
-    auto& engine = view.get<Engine>(entity);
-    engine.cam_shaft_angle += dt.count();
-  }
+    auto view = registry.view<Engine>();
+    for (auto entity : view)
+    {
+        auto& engine = view.get<Engine>(entity);
+        engine.cam_shaft_angle += dt.count();
+    }
 }
 
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
@@ -41,23 +41,38 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
         auto& durability = view.get<Durability>(entity).durability;
         if (OInputPressed(OMouse1) && machine.getBoundingBox().Contains(oInput->mousePosf))
         {
-            auto speed = state.repairium > 0.f ? 
-                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE : 
+            auto speed = state.repairium > 0.f ?
+                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE :
                 Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WHEN_EMPTY;
 
             durability = std::min(1.f, durability + dt.count() * speed);
 
             state.is_repairing = true;
         }
-        else
-        {
-            durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
-        }
     }
-    
+
     if (!was_repairing)
     {
         state.started_repairing = true;
+    }
+}
+
+void updateWear(LevelData& state, std::chrono::duration<float> dt)
+{
+    if (state.is_repairing)
+    {
+        return;
+    }
+
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Durability, Machine>();
+    bool was_repairing = state.is_repairing;
+    state.started_repairing = false;
+    state.is_repairing = false;
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
     }
 }
 
@@ -75,21 +90,20 @@ Quality computeQuality(float averageDurability)
     return Quality::Medium;
 }
 
-void updateQuality(LevelData& state, std::chrono::duration<float> dt)
+void computeMachineState(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability>();
 
-    float quality = 0.f;
+    float min_durability = 1.f;
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
 
-        quality += durability;
+        min_durability = std::min(min_durability, durability);
     }
 
-    auto averageDurability = quality / view.size();
-    state.quality = computeQuality(averageDurability);
+    state.quality = computeQuality(min_durability);
 }
 
 void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
@@ -157,7 +171,8 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(registry, dt);
     updateEngines(registry, dt);
     updateDurability(level, dt);
-    updateQuality(level, dt);
+    updateWear(level, dt);
+    computeMachineState(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
 
