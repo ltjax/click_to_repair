@@ -6,7 +6,7 @@ class ClickToRepairConan(ConanFile):
 
     def requirements(self):
         requirements = []
-        if self.settings.os != "Linux":
+        if self.settings.os == "Linux":
             # Please install glew and SDL2 from system libraries
             # e.g. 
             #   sudo apt-get install libglew-dev libsdl2-dev
