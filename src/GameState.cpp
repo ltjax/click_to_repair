@@ -2,6 +2,7 @@
 #include <onut/Input.h>
 #include <onut/onut.h>
 #include "WinScreen.hpp"
+#include "InGameScreen.hpp"
 
 std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
 {
@@ -12,7 +13,7 @@ std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
     }
 
     if (OInputPressed(OMouse1))
-        return std::make_unique<IngameScreen>();
+        return std::make_unique<InGameScreen>();
 
     return nullptr;
 }
@@ -43,31 +44,3 @@ void MainMenuScreen::render()
 //    advance_level(state);
 //}
 
-IngameScreen::IngameScreen()
-    : level(create_level(0)), updater(level), renderer(level)
-{
-}
-
-std::unique_ptr<Screen> IngameScreen::update(std::chrono::duration<float> dt)
-{
-    auto finished = updater.run(dt);
-
-    if (finished)
-    {
-        return std::make_unique<WinScreen>();
-    }
-
-    if (OInputJustPressed(OKeyEscape))
-        return std::make_unique<MainMenuScreen>();
-//
-//#ifndef NDEBUG
-//    if (OInputJustPressed(OKeyRight))
-//        advance_level(*this);
-//#endif
-    return nullptr;
-}
-
-void IngameScreen::render()
-{
-    renderer.run();
-}

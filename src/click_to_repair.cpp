@@ -19,6 +19,7 @@
 #include "Updater.hpp"
 #include "Renderer.hpp"
 #include "Components.hpp"
+#include "InGameScreen.hpp"
 
 // Global game state
 GameState gameState;
@@ -31,7 +32,7 @@ void initSettings()
 void init()
 {
     oContentManager->addSearchPath("../../../../assets");
-    gameState.menu_state = std::make_unique<IngameScreen>();
+    gameState.menu_state = std::make_unique<InGameScreen>();
 }
 
 void update()

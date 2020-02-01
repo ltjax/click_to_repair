@@ -15,6 +15,8 @@ add_executable(${TARGET_NAME} WIN32
   Levels.cpp
   Levels.hpp
   Screen.hpp
+  InGameScreen.cpp
+  InGameScreen.hpp
   WinScreen.cpp
   WinScreen.hpp
 )
