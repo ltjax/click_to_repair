@@ -28,8 +28,8 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
         auto& durability = view.get<Durability>(entity).durability;
         if (OInputPressed(OMouse1) && machine.getBoundingBox().Contains(oInput->mousePosf))
         {
-            auto speed = state.repairium > 0.f ? 
-                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE : 
+            auto speed = state.repairium > 0.f ?
+                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE :
                 Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WHEN_EMPTY;
 
             durability = std::min(1.f, durability + dt.count() * speed);
@@ -48,36 +48,51 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
-Quality computeQuality(float averageDurability)
+Quality computeQuality(float durability, float lower, float upper )
 {
-    if (averageDurability < 0.1)
+    if (durability < lower)
     {
         return Quality::Worst;
     }
 
-    if (averageDurability >= 0.8)
+    if (durability >= upper)
     {
         return Quality::Good;
     }
     return Quality::Medium;
 }
 
-void updateQuality(LevelData& state, std::chrono::duration<float> dt)
+void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability>();
 
-    float quality = 0.f;
+    float total_durability = 0.f;
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
 
-        quality += durability;
+        total_durability += durability;
     }
 
-    auto averageDurability = quality / view.size();
-    state.quality = computeQuality(averageDurability);
+    auto averageDurability = total_durability / view.size();
+    state.quality = computeQuality(averageDurability, 0.1, 0.8);
 }
+
+void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Gear, Durability, Quality>();
+
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<Quality>(entity);
+
+        quality = computeQuality(durability, 0.1, 0.5);
+    }
+}
+
 
 void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
 {
@@ -143,7 +158,8 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     auto& registry = level.entities;
     updateGears(registry, dt);
     updateDurability(level, dt);
-    updateQuality(level, dt);
+    updateGearQuality(level, dt);
+    updateGlobalQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
 

@@ -6,6 +6,7 @@ entt::entity createGear(entt::registry& registry, Vector2 position)
 {
     auto gear = registry.create();
     registry.assign<Machine>(gear, position, 128.f);
+    registry.assign<Quality>(gear, Quality::Good);
     registry.assign<Gear>(gear);
     registry.assign<Durability>(gear, 1.f);
     return gear;
