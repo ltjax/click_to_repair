@@ -12,6 +12,15 @@ entt::entity createGear(entt::registry& registry, Vector2 position)
     return gear;
 }
 
+entt::entity createEngine(entt::registry& registry, Vector2 position)
+{
+  auto engine = registry.create();
+  registry.assign<Machine>(engine, position, 128.f);
+  registry.assign<Engine>(engine);
+  registry.assign<Durability>(engine, 1.f);
+  return engine;
+}
+
 void level0(entt::registry& registry, LevelData& state)
 {
     createGear(registry, OScreenCenterf);

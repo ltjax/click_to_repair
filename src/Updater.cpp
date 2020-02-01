@@ -14,7 +14,18 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     {
         auto& gear = view.get<Gear>(entity);
         gear.rotation = Matrix::CreateRotationZ(dt.count()) * gear.rotation;
+        gear.delta += dt.count();
     }
+}
+
+void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
+{
+  auto view = registry.view<Engine>();
+  for (auto entity : view)
+  {
+    auto& engine = view.get<Engine>(entity);
+    engine.cam_shaft_angle += dt.count();
+  }
 }
 
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
@@ -146,7 +157,7 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
     // normal condition
     state.repairium += 0.05f * dt.count();
 
-    if (state.repairium >= 1.f)
+    if (state.repairium >= 1.0f)
     {
         state.repairium = 1.f;
         state.won_level = true;
@@ -157,6 +168,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
     auto& registry = level.entities;
     updateGears(registry, dt);
+    updateEngines(registry, dt);
     updateDurability(level, dt);
     updateGearQuality(level, dt);
     updateGlobalQuality(level, dt);
