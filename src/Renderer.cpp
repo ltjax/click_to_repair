@@ -122,7 +122,7 @@ void renderDurabilityBar(entt::registry const& registry, Matrix const& camera)
         auto p = Vector2::Transform(machine.position, camera);
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto barHeight = 10.f;
+        auto barHeight = 20.f;
         auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
         renderBar(oSpriteBatch, backgroundRect, durability, colorForQuality(quality));
     }
@@ -130,7 +130,7 @@ void renderDurabilityBar(entt::registry const& registry, Matrix const& camera)
 
 void renderRepairiumBar(LevelData const& state)
 {
-    auto barHeight = 30.f;
+    auto barHeight = 45.f;
     auto screenSize = OScreenf;
     auto rect = Rect{ 0.f, screenSize.y - barHeight, screenSize.x, barHeight };
     rect = shrinkRect(rect, Vector2{ 8.f });
