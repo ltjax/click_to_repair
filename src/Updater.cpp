@@ -3,6 +3,8 @@
 #include <onut/Input.h>
 #include <onut/onut.h>
 #include "Constants.hpp"
+#include <onut/Sound.h>
+#include <random>
 
 void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 {
@@ -76,6 +78,30 @@ void updateQuality(GameState& state, std::chrono::duration<float> dt)
     state.quality = computeQuality(averageDurability);
 }
 
+void updateRepairTime(GameState& state, std::chrono::duration<float> dt)
+{
+    static std::mt19937 Rng;
+
+    if (state.is_repairing)
+    {
+        auto previous = state.repair_time;
+        state.repair_time += dt.count();
+
+        auto sound_period = 0.5f;
+        if (std::ceil(previous / sound_period) != std::ceil(state.repair_time / sound_period))
+        {
+            std::uniform_int_distribution<int> SoundIndex(1, 7);
+            OPlaySound("wrench_" + std::to_string(SoundIndex(Rng)) + ".wav", 1.f, 0.f, 1.f);
+        }
+
+        return; // No new repairium if we repair
+    }
+    else
+    {
+        state.repair_time = 0.f;
+    }
+}
+
 void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 {
     if (state.is_repairing)
@@ -85,12 +111,7 @@ void updateRepairum(GameState& state, std::chrono::duration<float> dt)
             state.repairium = std::max(0.f, state.repairium - Constants::REPAIR_UP_FRONT_COST);
         }
         state.repairium = std::max(0.f, state.repairium - dt.count() * Constants::REPAIR_RESOURCE_DRAIN_PER_SECOND);
-        state.repair_time += dt.count();
         return; // No new repairium if we repair
-    }
-    else
-    {
-        state.repair_time = 0.f;
     }
 
     if (state.quality == Quality::Worst)
@@ -122,6 +143,7 @@ void Updater::run(std::chrono::duration<float> dt)
     updateGears(registry, dt);
     updateDurability(state_, dt);
     updateQuality(state_, dt);
+    updateRepairTime(state_, dt);
     updateRepairum(state_, dt);
     
     if (OInputJustPressed(OKeyEscape))
