@@ -106,7 +106,7 @@ void renderCursor(GameState const& state)
     const float targetSize = 96;
     oRenderer->renderStates.blendMode = OBlendAlpha;
     static float rot_time;
-    auto s = std::sinf(state.repair_time * 7.f);
+    auto s = std::isinf(state.repair_time * 7.f);
     float rotation = (s < 0 ? 1.f : -1.f) * (s*s) * 25.f;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
