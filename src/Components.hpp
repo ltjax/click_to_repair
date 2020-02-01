@@ -3,6 +3,7 @@
 #include <onut/Vector4.h>
 #include <onut/Matrix.h>
 #include <onut/Sound.h>
+#include "Levels.hpp"
 
 struct Durability
 {
@@ -45,6 +46,12 @@ struct HoverState
 struct HoverSound
 {
     OSoundInstanceRef background;
+};
+
+struct QualityStatus
+{
+    Quality previous = Quality::Good;
+    Quality current;
 };
 
 struct Hamster 

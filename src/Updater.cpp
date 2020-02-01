@@ -188,41 +188,17 @@ Quality computeQuality(float durability, float lower, float upper)
 }
 
 
-Quality minQuality(Quality first, Quality second)
-{
-    switch (first) 
-    {
-        case Quality::Good:
-            return second;
-
-        case Quality::Worst:
-            return Quality::Worst;
-
-        case Quality::Medium:
-            if (second==Quality::Worst)
-            {
-                return Quality::Worst;
-            }
-            else
-            {
-                return Quality::Medium;
-            }
-    }
-
-    return Quality::Worst;
-}
-
 void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Quality>();
+    auto view = registry.view<QualityStatus>();
 
     state.quality = Quality::Good;
     for (auto entity : view)
     {
-        auto& quality = view.get<Quality>(entity);
+        auto& quality = view.get<QualityStatus>(entity).current;
 
-        state.quality = minQuality(state.quality, quality);
+        state.quality = std::min(state.quality, quality);
     }
 
 }
@@ -230,14 +206,15 @@ void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Gear, Durability, Quality>();
+    auto view = registry.view<Gear, Durability, QualityStatus>();
 
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
-        auto& quality = view.get<Quality>(entity);
+        auto& quality = view.get<QualityStatus>(entity);
 
-        quality = computeQuality(durability, 0.1, 0.5);
+        quality.previous = quality.current;
+        quality.current = computeQuality(durability, 0.1, 0.5);
     }
 }
 

@@ -7,7 +7,7 @@ entt::entity createGear(entt::registry& registry, Vector2 position, float durabi
 {
     auto gear = registry.create();
     registry.assign<Machine>(gear, position, 128.f);
-    registry.assign<Quality>(gear, Quality::Good);
+    registry.assign<QualityStatus>(gear);
     registry.assign<Gear>(gear);
     registry.assign<Durability>(gear, durability);
     registry.assign<HoverSound>(gear, OCreateSoundInstance("aircompressor.wav"));
@@ -19,7 +19,7 @@ entt::entity createEngine(entt::registry& registry, Vector2 position, float dura
 {
     auto engine = registry.create();
     registry.assign<Machine>(engine, position, 128.f);
-    registry.assign<Quality>(engine, Quality::Good);
+    registry.assign<QualityStatus>(engine);
     registry.assign<Engine>(engine);
     registry.assign<Durability>(engine, durability);
     registry.assign<HoverState>(engine);
