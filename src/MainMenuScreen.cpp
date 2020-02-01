@@ -80,7 +80,7 @@ void MainMenuScreen::render()
     auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
     const float targetSize = OScreenHf * 2.f / 3.f;
-    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f),
+    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f + 32.f),
       Color::White, anim_main_logo_ - 15.f, targetSize / textureSize.x, onut::Align::Center);
   }
 
