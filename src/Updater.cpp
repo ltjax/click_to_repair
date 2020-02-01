@@ -138,7 +138,7 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
-void Updater::run(std::chrono::duration<float> dt)
+std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
     auto& registry = level.entities;
     updateGears(registry, dt);
@@ -146,4 +146,11 @@ void Updater::run(std::chrono::duration<float> dt)
     updateQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
+
+    if (level.won_level)
+    {
+        return GameFinished{};
+    }
+
+    return {};
 }

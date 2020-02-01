@@ -14,6 +14,9 @@ add_executable(${TARGET_NAME} WIN32
   Constants.hpp
   Levels.cpp
   Levels.hpp
+  Screen.hpp
+  WinScreen.cpp
+  WinScreen.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 

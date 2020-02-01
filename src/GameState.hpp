@@ -3,15 +3,7 @@
 #include "Levels.hpp"
 #include "Updater.hpp"
 #include "Renderer.hpp"
-
-struct Screen
-{
-    virtual ~Screen() = default;
-    virtual std::unique_ptr<Screen> update(std::chrono::duration<float> dt) {
-        return nullptr;
-    }
-    virtual void render() {}
-};
+#include "Screen.hpp"
 
 struct MainMenuScreen : Screen
 {

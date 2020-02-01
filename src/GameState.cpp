@@ -1,6 +1,7 @@
 #include "GameState.hpp"
 #include <onut/Input.h>
 #include <onut/onut.h>
+#include "WinScreen.hpp"
 
 std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
 {
@@ -49,7 +50,12 @@ IngameScreen::IngameScreen()
 
 std::unique_ptr<Screen> IngameScreen::update(std::chrono::duration<float> dt)
 {
-    updater.run(dt);
+    auto finished = updater.run(dt);
+
+    if (finished)
+    {
+        return std::make_unique<WinScreen>();
+    }
 
     if (OInputJustPressed(OKeyEscape))
         return std::make_unique<MainMenuScreen>();

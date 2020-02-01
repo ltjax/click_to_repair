@@ -37,7 +37,11 @@ void init()
 void update()
 {
     auto dt = std::chrono::duration<float>{ ODT };
-    gameState.menu_state->update(dt);
+    auto next_state = gameState.menu_state->update(dt);
+    if (next_state)
+    {
+        gameState.menu_state = std::move(next_state);
+    }
 }
 
 void render()
