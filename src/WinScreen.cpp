@@ -9,6 +9,8 @@
 WinScreen::WinScreen()
 {
     checkmark_ = OGetTexture("level_complete.png");
+    sound_ = OCreateSoundInstance("level_complete.wav");
+    sound_->play();
 
     anim_.play(
         2.f, // From

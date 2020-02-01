@@ -2,6 +2,7 @@
 #include "Screen.hpp"
 #include <onut/Texture.h>
 #include <onut/Anim.h>
+#include <onut/Sound.h>
 
 struct WinScreen : Screen
 {
@@ -13,4 +14,5 @@ struct WinScreen : Screen
 private:
     OTextureRef checkmark_;
     OAnimFloat anim_;
+    OSoundInstanceRef sound_;
 };
