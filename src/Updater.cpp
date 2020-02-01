@@ -147,11 +147,19 @@ void updateHoverSounds(entt::registry& registry)
     {
         auto const hoverState = view.get<HoverState>(entity);
         auto const& hoverSound = view.get<HoverSound>(entity);
-        if (hoverState.containsMouse && !hoverSound.background->isPlaying())
+        if (hoverState.containsMouse)
         {
-            hoverSound.background->setLoop(true);
-            hoverSound.background->setVolume(1.f);
-            hoverSound.background->play();
+            if (!hoverSound.background->isPlaying())
+            {
+                hoverSound.background->setLoop(true);
+                hoverSound.background->setVolume(0.0f);
+                hoverSound.background->play();
+            }
+            else 
+            {
+                auto newVolume = std::clamp(hoverState.timeIn.count(), 0.f, 1.f);
+                hoverSound.background->setVolume(newVolume);
+            }
         }
         if (!hoverState.containsMouse && hoverSound.background->isPlaying())
         {

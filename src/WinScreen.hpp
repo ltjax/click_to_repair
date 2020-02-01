@@ -3,6 +3,7 @@
 #include "GameState.hpp"
 #include <onut/Texture.h>
 #include <onut/Anim.h>
+#include <onut/Sound.h>
 
 struct WinScreen : Screen
 {
@@ -16,4 +17,5 @@ private:
     int finished_level_;
     OTextureRef checkmark_;
     OAnimFloat anim_;
+    OSoundInstanceRef sound_;
 };

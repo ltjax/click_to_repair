@@ -12,6 +12,8 @@ WinScreen::WinScreen(Progress& progress, int finished_level)
 {
   progress_.next_available_level = std::max(progress_.next_available_level, finished_level_ + 1);
     checkmark_ = OGetTexture("level_complete.png");
+    sound_ = OCreateSoundInstance("level_complete.wav");
+    sound_->play();
 
     anim_.play(
         2.f, // From
