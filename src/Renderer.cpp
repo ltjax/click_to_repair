@@ -15,7 +15,7 @@ void renderMesh(OModel::Mesh* mesh, Matrix const& transform)
   oRenderer->drawIndexed(mesh->elementCount);
 }
 
-void renderEngines(entt::registry const& registry)
+void renderEngines(entt::registry const& registry, Matrix centerScreen)
 {
   auto model = OGetModel("engine.obj");
   auto view = registry.view<Machine const, Engine const>();
@@ -37,18 +37,20 @@ void renderEngines(entt::registry const& registry)
     auto rod_transform = 
       Matrix::CreateTranslation(rod_offset) * 
       Matrix::CreateScale(scale) * 
-      Matrix::CreateTranslation(machine.position);
+      Matrix::CreateTranslation(machine.position) *
+      centerScreen;
     renderMesh(model->getMesh(1), rod_transform);// rod
 
     auto piston_transform = 
       Matrix::CreateTranslation(piston_offset) * 
       Matrix::CreateScale(scale) * 
-      Matrix::CreateTranslation(machine.position);
+      Matrix::CreateTranslation(machine.position) *
+      centerScreen;
     renderMesh(model->getMesh(2), piston_transform); // render piston
   }
 }
 
-void renderGears(entt::registry const& registry)
+void renderGears(entt::registry const& registry, Matrix centerScreen)
 {
     auto model = OGetModel("gears.obj");
     auto view = registry.view<Machine const, Gear const>();
@@ -64,7 +66,8 @@ void renderGears(entt::registry const& registry)
           Matrix::CreateScale(scale) *
           gear.rotation *
           Matrix::CreateRotationY(wobbleAngle) * 
-          Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f);
+          Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f) *
+          centerScreen;
         
         renderMesh(model->getMesh(0), transform);
     }
@@ -94,7 +97,7 @@ void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Colo
     oSpriteBatch->drawRectScaled9(texture, rectangle, Vector4{ 4.f });
 }
 
-void renderMachineFrames(entt::registry const& registry)
+void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
 {
     auto frame = OGetTexture("frame.png");
     auto view = registry.view<Machine const>();
@@ -102,11 +105,11 @@ void renderMachineFrames(entt::registry const& registry)
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
-        oSpriteBatch->drawSprite(frame, machine.position);
+        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera));
     }
 }
 
-void renderDurabilityBar(entt::registry const& registry)
+void renderDurabilityBar(entt::registry const& registry, Matrix const& camera)
 {
     auto view = registry.view<Machine const, Durability const, Quality const>();
 
@@ -116,7 +119,7 @@ void renderDurabilityBar(entt::registry const& registry)
         auto durability = view.get<Durability const>(entity).durability;
         auto quality = view.get<Quality const>(entity);
 
-        auto p = machine.position;
+        auto p = Vector2::Transform(machine.position, camera);
         auto size = machine.size;
         auto halfSize = size * 0.5f;
         auto barHeight = 10.f;
@@ -193,12 +196,12 @@ void Renderer::run()
 
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
-    renderGears(registry);
-    renderEngines(registry);
+    renderGears(registry, level.camera);
+    renderEngines(registry, level.camera);
 
     oSpriteBatch->begin();
-    renderMachineFrames(registry);
-    renderDurabilityBar(registry);
+    renderMachineFrames(registry, level.camera);
+    renderDurabilityBar(registry, level.camera);
     renderRepairiumBar(level);
     renderQualityLights(level);
     oRenderer->renderStates.blendMode = OBlendAlpha;

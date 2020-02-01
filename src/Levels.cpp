@@ -26,19 +26,19 @@ entt::entity createEngine(entt::registry& registry, Vector2 position)
 
 void level0(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, OScreenCenterf);
+    createGear(registry, Vector2{0.f});
 }
 
 void level1(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, OScreenCenterf);
-    createGear(registry, OScreenCenterf + Vector2(200, 0));
+    createGear(registry, Vector2(-150, 0));
+    createGear(registry, Vector2(150, 0));
 }
 
 void level2(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, OScreenCenterf);
-    createEngine(registry, OScreenCenterf + Vector2(200, 0));
+    createGear(registry, Vector2(-150, 0));
+    createEngine(registry, Vector2(150, 0));
 }
 
 using LevelFunc = void (*)(entt::registry&, LevelData&);

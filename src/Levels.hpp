@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entt.hpp>
+#include <onut/Matrix.h>
 
 enum class Quality
 {
@@ -18,6 +19,7 @@ struct LevelData
     bool started_repairing = false;
     float repair_time = 0.f;
     bool won_level = false;
+    Matrix camera;
 };
 
 LevelData create_level(int index);

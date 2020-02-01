@@ -14,10 +14,11 @@ struct Machine
     Vector2 position;
     float size = 128.f;
 
-    Rect getBoundingBox() const
+    Rect getBoundingBox(Matrix const& camera) const
     {
+        auto p = Vector2::Transform(position, camera);
         auto halfSize = size * 0.5f;
-        return Rect{ -halfSize + position.x, -halfSize + position.y, size, size };
+        return Rect{ -halfSize + p.x, -halfSize + p.y, size, size };
     }
 
 };
