@@ -21,12 +21,22 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 
 void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
 {
-    auto view = registry.view<Engine>();
-    for (auto entity : view)
-    {
-        auto& engine = view.get<Engine>(entity);
-        engine.cam_shaft_angle += dt.count();
-    }
+  auto view = registry.view<Engine>();
+  for (auto entity : view)
+  {
+    auto& engine = view.get<Engine>(entity);
+    engine.camShaftAngle += dt.count();
+  }
+}
+
+void updateHamsters(entt::registry& registry, std::chrono::duration<float> dt)
+{
+  auto view = registry.view<Hamster>();
+  for (auto entity : view)
+  {
+    auto& hamster = view.get<Hamster>(entity);
+    hamster.delta += dt.count();
+  }
 }
 
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
@@ -137,11 +147,19 @@ void updateHoverSounds(entt::registry& registry)
     {
         auto const hoverState = view.get<HoverState>(entity);
         auto const& hoverSound = view.get<HoverSound>(entity);
-        if (hoverState.containsMouse && !hoverSound.background->isPlaying())
+        if (hoverState.containsMouse)
         {
-            hoverSound.background->setLoop(true);
-            hoverSound.background->setVolume(1.f);
-            hoverSound.background->play();
+            if (!hoverSound.background->isPlaying())
+            {
+                hoverSound.background->setLoop(true);
+                hoverSound.background->setVolume(0.0f);
+                hoverSound.background->play();
+            }
+            else 
+            {
+                auto newVolume = std::clamp(hoverState.timeIn.count(), 0.f, 1.f);
+                hoverSound.background->setVolume(newVolume);
+            }
         }
         if (!hoverState.containsMouse && hoverSound.background->isPlaying())
         {
@@ -311,6 +329,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateHoverSounds(registry);
     updateGears(registry, dt);
     updateEngines(registry, dt);
+    updateHamsters(registry, dt);
     updateDurability(level, dt);
     updateWear(level, dt);
     updateGearQuality(level, dt);

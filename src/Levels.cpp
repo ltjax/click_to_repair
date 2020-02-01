@@ -23,7 +23,19 @@ entt::entity createEngine(entt::registry& registry, Vector2 position, float dura
     registry.assign<Engine>(engine);
     registry.assign<Durability>(engine, durability);
     registry.assign<HoverState>(engine);
+    registry.assign<HoverSound>(engine, OCreateSoundInstance("ambient_machine1.wav"));
     return engine;
+}
+
+entt::entity createHamster(entt::registry& registry, Vector2 position)
+{
+  auto hamster = registry.create();
+  registry.assign<Machine>(hamster, position, 128.f);
+  registry.assign<Hamster>(hamster);
+  registry.assign<Durability>(hamster, 1.f);
+  registry.assign<HoverState>(hamster);
+  registry.assign<Quality>(hamster, Quality::Good);
+  return hamster;
 }
 
 void level0(entt::registry& registry, LevelData& state)
