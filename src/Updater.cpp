@@ -346,15 +346,8 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
         return;
     }
 
-    if (state.quality == Quality::Good)
-    {
-        // machine is in SUPER condition and run
-        state.repairium += 0.1f * dt.count();
-        return;
-    }
-
-    // normal condition
-    state.repairium += 0.05f * dt.count();
+    auto reparium_per_second = ((state.quality == Quality::Good) ? 0.1f : 0.05f) * state.reparium_multiplier;
+    state.repairium += reparium_per_second * dt.count();
 }
 
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)

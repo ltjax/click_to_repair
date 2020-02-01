@@ -22,6 +22,7 @@ struct LevelData
     bool won_level = false;
     Matrix camera;
     std::mt19937 rng;
+    float reparium_multiplier = 1.f;
 };
 
 LevelData create_level(int index);

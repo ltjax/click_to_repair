@@ -114,7 +114,7 @@ void MainMenuScreen::render()
     auto padding = 32.f;
     auto offset = Vector2{ padding, 0.f };
 
-    for (int level = 0; level < progress.next_available_level; ++level)
+    for (int level = 0, level_end = std::min(progress.next_available_level, Constants::MAX_LEVELS()-1); level < level_end; ++level)
     {
       auto rect = get_level_box(level);
       auto connect = level == progress.next_available_level -1 ? texture_connect_next : texture_connect;
