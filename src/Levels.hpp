@@ -2,6 +2,7 @@
 
 #include <entt/entt.hpp>
 #include <onut/Matrix.h>
+#include <random>
 
 enum class Quality
 {
@@ -20,6 +21,7 @@ struct LevelData
     float repair_time = 0.f;
     bool won_level = false;
     Matrix camera;
+    std::mt19937 rng;
 };
 
 LevelData create_level(int index);

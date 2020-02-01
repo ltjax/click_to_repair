@@ -21,25 +21,48 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 
 void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
 {
-  auto view = registry.view<Engine>();
-  for (auto entity : view)
-  {
-    auto& engine = view.get<Engine>(entity);
-    engine.camShaftAngle += dt.count();
-  }
+    auto view = registry.view<Engine>();
+    for (auto entity : view)
+    {
+        auto& engine = view.get<Engine>(entity);
+        engine.camShaftAngle += dt.count();
+    }
 }
 
 void updateHamsters(entt::registry& registry, std::chrono::duration<float> dt)
 {
-  auto view = registry.view<Hamster>();
-  for (auto entity : view)
-  {
-    auto& hamster = view.get<Hamster>(entity);
-    hamster.delta += dt.count();
-  }
+    auto view = registry.view<Hamster>();
+    for (auto entity : view)
+    {
+        auto& hamster = view.get<Hamster>(entity);
+        hamster.delta += dt.count();
+    }
 }
 
-void updateDurability(LevelData& state, std::chrono::duration<float> dt)
+void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
+{
+    using D = std::uniform_real_distribution<float>;
+
+    auto& registry = state.entities;
+    auto hiccupDurabilityLoss = state.quality != Quality::Worst ? D(0.07f, 0.085f) : D(0.15f, 0.2f);
+    D hiccupPause(2.0f, 2.4f);
+    auto view = registry.view<Hamster>();
+    for (auto entity : view)
+    {
+        auto& hamster = view.get<Hamster>(entity);
+        if (hamster.nextHiccup <= std::chrono::duration<float>{0})
+        {
+            hamster.decay += hiccupDurabilityLoss(state.rng);
+            hamster.nextHiccup = std::chrono::duration<float>(hiccupPause(state.rng));
+        }
+        else
+        {
+            hamster.nextHiccup -= dt;
+        }
+    }
+}
+
+void updateRepair(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability, Machine, HoverState>();
@@ -83,20 +106,42 @@ void updateGearWear(LevelData& state, std::chrono::duration<float> dt)
 void updateEngineWear(LevelData& state, std::chrono::duration<float> delta)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Durability, Machine, Engine>();
+    auto view = registry.view<Durability, Engine>();
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
 
-        auto wear = view.get<Engine>(entity).shake > 0.f ? 
-            Constants::ENGINE_WEAR_PER_SECOND_SHAKING : 
+        auto wear = view.get<Engine>(entity).shake > 0.f ?
+            Constants::ENGINE_WEAR_PER_SECOND_SHAKING :
             Constants::ENGINE_WEAR_PER_SECOND;
         durability = std::max(0.f, durability - delta.count() * wear);
     }
 }
 
+void updateHamsterWear(LevelData& state, std::chrono::duration<float> delta)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Durability, Hamster>();
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& hamster = view.get<Hamster>(entity);
+
+        if (hamster.decay <= 0.f)
+            continue;
+
+        float decayThisFrame = std::min(hamster.decay, delta.count() * 0.4f);
+        hamster.decay -= decayThisFrame;
+        durability = std::max(0.f, durability - decayThisFrame);
+    }
+}
+
 void updateWear(LevelData& state, std::chrono::duration<float> dt)
 {
+    // Hamsters always wear down!
+    updateHamsterWear(state, dt);
+
+    // Everything else only does when the machine is running
     if (state.is_repairing)
     {
         return;
@@ -155,7 +200,7 @@ void updateHoverSounds(entt::registry& registry)
                 hoverSound.background->setVolume(0.0f);
                 hoverSound.background->play();
             }
-            else 
+            else
             {
                 auto newVolume = std::clamp(hoverState.timeIn.count(), 0.f, 1.f);
                 hoverSound.background->setVolume(newVolume);
@@ -190,23 +235,23 @@ Quality computeQuality(float durability, float lower, float upper)
 
 Quality minQuality(Quality first, Quality second)
 {
-    switch (first) 
+    switch (first)
     {
-        case Quality::Good:
-            return second;
+    case Quality::Good:
+        return second;
 
-        case Quality::Worst:
+    case Quality::Worst:
+        return Quality::Worst;
+
+    case Quality::Medium:
+        if (second == Quality::Worst)
+        {
             return Quality::Worst;
-
-        case Quality::Medium:
-            if (second==Quality::Worst)
-            {
-                return Quality::Worst;
-            }
-            else
-            {
-                return Quality::Medium;
-            }
+        }
+        else
+        {
+            return Quality::Medium;
+        }
     }
 
     return Quality::Worst;
@@ -263,7 +308,19 @@ void updateEngineQuality(LevelData& state, std::chrono::duration<float> dt)
             engine.shake = std::max(0.f, engine.shake - dt / Constants::ENGINE_SHAKE_DURATION);
         }
     }
+}
 
+void updateHamsterQuality(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Hamster, Durability, Quality>();
+
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<Quality>(entity);
+        quality = computeQuality(durability, 0.05, 0.15);
+    }
 }
 
 
@@ -330,10 +387,12 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(registry, dt);
     updateEngines(registry, dt);
     updateHamsters(registry, dt);
-    updateDurability(level, dt);
+    updateHamsterHiccups(level, dt);
+    updateRepair(level, dt);
     updateWear(level, dt);
     updateGearQuality(level, dt);
     updateEngineQuality(level, dt);
+    updateHamsterQuality(level, dt);
     updateGlobalQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
