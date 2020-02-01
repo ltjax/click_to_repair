@@ -15,8 +15,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="lightbulb.svg"
-   inkscape:export-filename="../unprocessed/lightbulb.png"
+   sodipodi:docname="lightbulb_off.svg"
+   inkscape:export-filename="../assets/lightbulb_off.png"
    inkscape:export-xdpi="360"
    inkscape:export-ydpi="360">
   <defs
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -69,7 +69,7 @@
        inkscape:connector-curvature="0" />
     <path
        style="opacity:1;fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.85522556;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 204.18272,702.03077 9.65696,11.17913 8.8515,-11.89342 10.49093,11.35283 11.19233,-14.35187 10.84163,14.24544 12.50957,-13.49567 11.35343,13.49567 11.99777,-11.99616 11.19233,16.39328"
+       d="m 205.63247,706.31648 9.44249,11.17913 8.65491,-11.89342 10.25794,11.35283 10.94375,-14.35187 10.60085,14.24544 12.23174,-13.49567 11.10128,13.49567 11.73131,-11.99616 10.94376,16.39328"
        id="path4141"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccccc" />
