@@ -14,5 +14,6 @@ struct GameState
     Quality quality = Quality::Good;
     entt::registry entities;
     bool is_repairing = false;
+    bool started_repairing = false;
     float repair_time = 0.f;
 };

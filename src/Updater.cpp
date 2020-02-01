@@ -2,6 +2,7 @@
 #include "Components.hpp"
 #include <onut/Input.h>
 #include <onut/onut.h>
+#include "Constants.hpp"
 
 void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 {
@@ -17,20 +18,28 @@ void updateDurability(GameState& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability, Machine>();
-
+    state.started_repairing = false;
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
         auto& durability = view.get<Durability>(entity).durability;
         if (OInputPressed(OMouse1) && machine.getBoundingBox().Contains(oInput->mousePosf))
         {
-            auto speed = state.repairium > 0.f ? 0.15f : 0.03f;
+            auto speed = state.repairium > 0.f ? 
+                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WITH_RESOURCE : 
+                Constants::REPAIR_DURATION_INCREASE_PER_SECOND_WHEN_EMPTY;
+
             durability = std::min(1.f, durability + dt.count() * speed);
+
+            if (!state.is_repairing)
+            {
+                state.started_repairing = true;
+            }
             state.is_repairing = true;
         }
         else
         {
-            durability = std::max(0.f, durability - dt.count() * 0.05f);
+            durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
             state.is_repairing = false;
         }
     }
@@ -71,11 +80,18 @@ void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 {
     if (state.is_repairing)
     {
-        state.repairium = std::max(0.f, state.repairium - dt.count() * 0.2f);
+        if (state.started_repairing)
+        {
+            state.repairium = std::max(0.f, state.repairium - Constants::REPAIR_UP_FRONT_COST);
+        }
+        state.repairium = std::max(0.f, state.repairium - dt.count() * Constants::REPAIR_RESOURCE_DRAIN_PER_SECOND);
         state.repair_time += dt.count();
+        return; // No new repairium if we repair
     }
     else
+    {
         state.repair_time = 0.f;
+    }
 
     if (state.quality == Quality::Worst)
     {
