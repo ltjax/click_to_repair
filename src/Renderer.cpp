@@ -22,22 +22,27 @@ void renderGears(entt::registry const& registry)
     }
 }
 
-void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness)
+Color colorForDuration(float duration)
 {
-    auto contentRect = shrinkRect(rectangle, Vector2{ 1 });
-    contentRect.z *= fullness;
-    oSpriteBatch->drawRect(nullptr, rectangle, Color::White);
-
-    auto color = OColorRGB(88, 88, 88);
-    if (fullness < 0.1f)
+    auto color = OColorRGB(255, 255, 255);
+    if (duration < 0.1f)
     {
         color = OColorRGB(220, 20, 20);
     }
-    else if (fullness < 0.5f)
+    else if (duration < 0.5f)
     {
         color = OColorRGB(220, 220, 20);
     }
+    return color;
+}
+
+void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
+{
+    auto texture = OGetTexture("bar.png");
+    auto contentRect = shrinkRect(rectangle, Vector2{ 4 });
+    contentRect.z *= fullness;
     oSpriteBatch->drawRect(nullptr, contentRect, color);
+    oSpriteBatch->drawRectScaled9(texture, rectangle, Vector4{8.f});
 }
 
 void renderDurabilityBar(entt::registry const& registry)
@@ -52,19 +57,19 @@ void renderDurabilityBar(entt::registry const& registry)
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto barHeight = 10.f;
+        auto barHeight = 20.f;
         auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
-        renderBar(oSpriteBatch, backgroundRect, durability);
+        renderBar(oSpriteBatch, backgroundRect, durability, colorForDuration(durability));
     }
 }
 
 void renderRepairiumBar(GameState const& state)
 {
-    auto barHeight = 32.f;
+    auto barHeight = 36.f;
     auto screenSize = OScreenf;
     auto rect = Rect{0.f, screenSize.y - barHeight, screenSize.x, barHeight};
     rect = shrinkRect(rect, Vector2{8.f});
-    renderBar(oSpriteBatch, rect, state.repairium);
+    renderBar(oSpriteBatch, rect, state.repairium, Color::White);
 }
 
 void renderQualityLights(GameState const& state)
