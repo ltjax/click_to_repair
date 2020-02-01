@@ -12,7 +12,7 @@ std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
   }
 
   if (OInputPressed(OMouse1))
-    return std::make_unique<InGameScreen>();
+    return std::make_unique<InGameScreen>(0);
 
   return nullptr;
 }

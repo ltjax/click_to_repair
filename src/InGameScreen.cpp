@@ -3,8 +3,8 @@
 #include "WinScreen.hpp"
 #include <onut/Input.h>
 
-InGameScreen::InGameScreen()
-    : level(create_level(0)), updater(level), renderer(level)
+InGameScreen::InGameScreen(int levelNumber)
+    : level(create_level(levelNumber)), updater(level), renderer(level)
 {
 }
 

@@ -6,11 +6,10 @@
 
 struct InGameScreen : Screen
 {
-    InGameScreen();
+    InGameScreen(int levelNumber);
     std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
     void render() override;
 
-    int level_index = 0;
     LevelData level;
     Updater updater;
     Renderer renderer;
