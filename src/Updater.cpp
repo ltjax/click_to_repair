@@ -18,6 +18,16 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     }
 }
 
+void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
+{
+  auto view = registry.view<Engine>();
+  for (auto entity : view)
+  {
+    auto& engine = view.get<Engine>(entity);
+    engine.cam_shaft_angle += dt.count();
+  }
+}
+
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
@@ -143,6 +153,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
     auto& registry = level.entities;
     updateGears(registry, dt);
+    updateEngines(registry, dt);
     updateDurability(level, dt);
     updateQuality(level, dt);
     updateRepairTime(level, dt);

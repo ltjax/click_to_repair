@@ -7,6 +7,47 @@
 #include "Constants.hpp"
 #include <onut/Model.h>
 
+void renderMesh(OModel::Mesh* mesh, Matrix const& transform)
+{
+  oRenderer->renderStates.world = transform;
+  oRenderer->renderStates.vertexBuffer = mesh->pVertexBuffer;
+  oRenderer->renderStates.indexBuffer = mesh->pIndexBuffer;
+  oRenderer->drawIndexed(mesh->elementCount);
+}
+
+void renderEngines(entt::registry const& registry)
+{
+  auto model = OGetModel("engine.obj");
+  auto view = registry.view<Machine const, Engine const>();
+  for (auto entity : view)
+  {
+    auto const& machine = view.get<Machine const>(entity);
+    auto const& engine = view.get<Engine const>(entity);
+
+    auto boundsX = std::abs(model->getBoundingBox()->x);
+    auto scale = machine.size / (3.f * boundsX);
+
+    auto cam_shaft_transform = Matrix::CreateScale(scale) * Matrix::CreateTranslation(machine.position);
+    renderMesh(model->getMesh(0), cam_shaft_transform);
+  
+    auto angle = engine.cam_shaft_angle * 8.f;
+    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle) } * 0.5f;
+    auto piston_offset = Vector2{ 0.f, 3.2f + rod_offset.y };
+
+    auto rod_transform = 
+      Matrix::CreateTranslation(rod_offset) * 
+      Matrix::CreateScale(scale) * 
+      Matrix::CreateTranslation(machine.position);
+    renderMesh(model->getMesh(1), rod_transform);// rod
+
+    auto piston_transform = 
+      Matrix::CreateTranslation(piston_offset) * 
+      Matrix::CreateScale(scale) * 
+      Matrix::CreateTranslation(machine.position);
+    renderMesh(model->getMesh(2), piston_transform); // render piston
+  }
+}
+
 void renderGears(entt::registry const& registry)
 {
     auto model = OGetModel("gears.obj");
@@ -16,19 +57,16 @@ void renderGears(entt::registry const& registry)
         auto const& machine = view.get<Machine const>(entity);
         auto const& gear = view.get<Gear const>(entity);
         
-        float const wobbleStrength = 0.2f;
-        float const wobbleAngle = wobbleStrength * std::sin(8.f * gear.delta);
-       
+        float const wobbleAngle = 0.2f * std::sin(8.f * gear.delta);
         auto boundsX = std::abs(model->getBoundingBox()->x);
-        auto scale = machine.size / (2.f * boundsX);
-        
+        auto scale = machine.size / (3.f * boundsX);
         auto transform =
           Matrix::CreateScale(scale) *
           gear.rotation *
           Matrix::CreateRotationY(wobbleAngle) * 
           Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f);
         
-        model->render(transform);
+        renderMesh(model->getMesh(0), transform);
     }
 }
 
@@ -136,7 +174,6 @@ void renderCursor(LevelData const& state)
     static float rot_time;
     auto s = std::sin(state.repair_time * 7.f);
     float rotation = (s < 0 ? 1.f : -1.f) * (s * s) * 25.f;
-    oRenderer->renderStates.blendMode = OBlendOpaque;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
@@ -146,7 +183,7 @@ void renderCursor(LevelData const& state)
 
 void Renderer::run()
 {
-    oRenderer->setupFor3D({ 0.f, -1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
+    oRenderer->setupFor3D({ 0.f, 1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
     oRenderer->set2DCamera(Vector2::Zero);
     oRenderer->clear(Constants::BackgroundColor());
     oRenderer->setAmbient(Color::White);
@@ -155,6 +192,7 @@ void Renderer::run()
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     renderGears(registry);
+    renderEngines(registry);
 
     oSpriteBatch->begin();
     renderMachineFrames(registry);

@@ -26,3 +26,8 @@ struct Gear
     Matrix rotation;
     float delta = 0.f;
 };
+
+struct Engine
+{
+  float cam_shaft_angle = 0.f;
+};
