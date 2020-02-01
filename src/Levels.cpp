@@ -9,6 +9,8 @@ entt::entity createGear(entt::registry& registry, Vector2 position)
     registry.assign<Quality>(gear, Quality::Good);
     registry.assign<Gear>(gear);
     registry.assign<Durability>(gear, 1.f);
+    registry.assign<HoverSound>(gear, OCreateSoundInstance("aircompressor.wav"));
+    registry.assign<HoverState>(gear);
     return gear;
 }
 
