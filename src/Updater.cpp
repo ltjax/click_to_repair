@@ -222,16 +222,17 @@ void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
 void updateEngineQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Engine, Durability, Quality>();
+    auto view = registry.view<Engine, Durability, QualityStatus>();
 
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
-        auto& quality = view.get<Quality>(entity);
+        auto& quality = view.get<QualityStatus>(entity);
         auto& engine = view.get<Engine>(entity);
 
-        quality = computeQuality(durability, 0.05, 0.75);
-        if (quality == Quality::Good)
+        quality.previous = quality.current;
+        quality.current = computeQuality(durability, 0.05, 0.75);
+        if (quality.current == Quality::Good)
         {
             engine.shake = 1.f;
         }
