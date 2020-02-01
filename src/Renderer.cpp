@@ -77,13 +77,16 @@ void renderEngines(entt::registry const& registry, Matrix centerScreen)
     auto const& engine = view.get<Engine const>(entity);
 
     auto boundsX = std::abs(model->getBoundingBox()->x);
-    auto scale = machine.size / (3.f * boundsX);
+    auto scale = machine.size / (2.5f * boundsX);
 
-    auto cam_shaft_transform = Matrix::CreateScale(scale) * Matrix::CreateTranslation(machine.position);
+    auto cam_shaft_transform =
+        Matrix::CreateScale(scale) *
+        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale }) *
+        centerScreen;
     renderMesh(model->getMesh(0), cam_shaft_transform);
   
     auto angle = engine.camShaftAngle * 8.f;
-    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle) } * 0.5f;
+    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle) - 2.f } * 0.5f;
     auto piston_offset = Vector2{ 0.f, 3.2f + rod_offset.y };
 
     auto rod_transform = 
@@ -113,15 +116,21 @@ void renderGears(entt::registry const& registry, Matrix centerScreen)
         
         float const wobbleAngle = 0.2f * std::sin(8.f * gear.delta);
         auto boundsX = std::abs(model->getBoundingBox()->x);
-        auto scale = machine.size / (3.f * boundsX);
-        auto transform =
-          Matrix::CreateScale(scale) *
-          gear.rotation *
-          Matrix::CreateRotationY(wobbleAngle) * 
-          Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f) *
-          centerScreen;
+        auto scale = machine.size / (2.f * boundsX);
+        auto small_wheel_transform =
+            Matrix::CreateScale(scale) *
+            gear.rotation *
+            Matrix::CreateTranslation(machine.position - Vector2{ 1.2f, -0.5f } * scale) *
+            centerScreen;
         
-        renderMesh(model->getMesh(0), transform);
+        auto large_wheel_transform =
+            Matrix::CreateScale(scale) *
+            gear.rotation.Invert() *
+            Matrix::CreateTranslation(machine.position - Vector2{-2.f, -0.5f} * scale) *
+            centerScreen;
+
+        renderMesh(model->getMesh(0), small_wheel_transform);
+        renderMesh(model->getMesh(1), large_wheel_transform);
     }
 }
 
@@ -247,11 +256,13 @@ void Renderer::run()
     oRenderer->clearDepth();
 
     auto& registry = level.entities;
-    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
+    oRenderer->renderStates.blendMode = OBlendOpaque;
+    oRenderer->renderStates.backFaceCull = false;
     renderGears(registry, level.camera);
     renderEngines(registry, level.camera);
     renderHamsters(registry, level.camera);
 
+    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     oSpriteBatch->begin();
     renderMachineFrames(registry, level.camera);
     renderDurabilityBar(registry, level.camera);
