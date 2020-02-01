@@ -31,7 +31,7 @@ void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Durability, Machine>();
+    auto view = registry.view<Durability, Machine, HoverState>();
     bool was_repairing = state.is_repairing;
     state.started_repairing = false;
     state.is_repairing = false;
