@@ -21,12 +21,22 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 
 void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
 {
-    auto view = registry.view<Engine>();
-    for (auto entity : view)
-    {
-        auto& engine = view.get<Engine>(entity);
-        engine.cam_shaft_angle += dt.count();
-    }
+  auto view = registry.view<Engine>();
+  for (auto entity : view)
+  {
+    auto& engine = view.get<Engine>(entity);
+    engine.camShaftAngle += dt.count();
+  }
+}
+
+void updateHamsters(entt::registry& registry, std::chrono::duration<float> dt)
+{
+  auto view = registry.view<Hamster>();
+  for (auto entity : view)
+  {
+    auto& hamster = view.get<Hamster>(entity);
+    hamster.delta += dt.count();
+  }
 }
 
 void updateDurability(LevelData& state, std::chrono::duration<float> dt)
@@ -311,6 +321,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateHoverSounds(registry);
     updateGears(registry, dt);
     updateEngines(registry, dt);
+    updateHamsters(registry, dt);
     updateDurability(level, dt);
     updateWear(level, dt);
     updateGearQuality(level, dt);

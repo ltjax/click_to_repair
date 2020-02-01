@@ -26,9 +26,18 @@ entt::entity createEngine(entt::registry& registry, Vector2 position)
     return engine;
 }
 
+entt::entity createHamster(entt::registry& registry, Vector2 position)
+{
+  auto hamster = registry.create();
+  registry.assign<Machine>(hamster, position, 128.f);
+  registry.assign<Hamster>(hamster);
+  registry.assign<Durability>(hamster, 1.f);
+  return hamster;
+}
+
 void level0(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, Vector2{0.f});
+    createHamster(registry, Vector2{ 0.f });
 }
 
 void level1(entt::registry& registry, LevelData& state)
