@@ -1,5 +1,6 @@
 #include "Updater.hpp"
 #include "Components.hpp"
+#include "Levels.hpp"
 #include <onut/Input.h>
 #include <onut/onut.h>
 #include "Constants.hpp"
@@ -16,7 +17,7 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     }
 }
 
-void updateDurability(GameState& state, std::chrono::duration<float> dt)
+void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability, Machine>();
@@ -61,7 +62,7 @@ Quality computeQuality(float averageDurability)
     return Quality::Medium;
 }
 
-void updateQuality(GameState& state, std::chrono::duration<float> dt)
+void updateQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability>();
@@ -78,7 +79,7 @@ void updateQuality(GameState& state, std::chrono::duration<float> dt)
     state.quality = computeQuality(averageDurability);
 }
 
-void updateRepairTime(GameState& state, std::chrono::duration<float> dt)
+void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
 {
     static std::mt19937 Rng;
 
@@ -102,7 +103,7 @@ void updateRepairTime(GameState& state, std::chrono::duration<float> dt)
     }
 }
 
-void updateRepairum(GameState& state, std::chrono::duration<float> dt)
+void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 {
     if (state.is_repairing)
     {
@@ -132,20 +133,17 @@ void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 
     if (state.repairium >= 1.f)
     {
-        // TODO: Win condition here!
         state.repairium = 1.f;
+        state.won_level = true;
     }
 }
 
 void Updater::run(std::chrono::duration<float> dt)
 {
-    auto& registry = state_.entities;
+    auto& registry = level.entities;
     updateGears(registry, dt);
-    updateDurability(state_, dt);
-    updateQuality(state_, dt);
-    updateRepairTime(state_, dt);
-    updateRepairum(state_, dt);
-    
-    if (OInputJustPressed(OKeyEscape))
-        OQuit();
+    updateDurability(level, dt);
+    updateQuality(level, dt);
+    updateRepairTime(level, dt);
+    updateRepairum(level, dt);
 }

@@ -1,19 +1,39 @@
 #pragma once
-#include <entt/entt.hpp>
+#include <memory>
+#include "Levels.hpp"
+#include "Updater.hpp"
+#include "Renderer.hpp"
 
-enum class Quality
+struct Screen
 {
-    Worst,
-    Medium,
-    Good
+    virtual ~Screen() = default;
+    virtual std::unique_ptr<Screen> update(std::chrono::duration<float> dt) {
+        return nullptr;
+    }
+    virtual void render() {}
+};
+
+struct MainMenuScreen : Screen
+{
+    std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
+    void render() override;
+};
+
+struct IngameScreen : Screen
+{
+    IngameScreen();
+    std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
+    void render() override;
+
+    int level_index = 0;
+    LevelData level;
+    Updater updater;
+    Renderer renderer;
 };
 
 struct GameState
 {
-    float repairium = 0.f;
-    Quality quality = Quality::Good;
-    entt::registry entities;
-    bool is_repairing = false;
-    bool started_repairing = false;
-    float repair_time = 0.f;
+    std::unique_ptr<Screen> menu_state; //std::make_unique<MainMenuScreen>();
 };
+
+void enter_main_menu(GameState&);

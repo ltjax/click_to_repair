@@ -1,14 +1,15 @@
 #pragma once
-#include "GameState.hpp"
+#include "Levels.hpp"
 #include <chrono>
 
 class Updater
 {
 public:
-    Updater(GameState& state) : state_(state) {}
+    Updater(LevelData& level_) : level(level_) {}
 
     void run(std::chrono::duration<float> dt);
 
 private:
-    GameState& state_;
+    LevelData& level;
 };
+

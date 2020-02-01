@@ -3,6 +3,7 @@ set(TARGET_NAME click_to_repair)
 add_executable(${TARGET_NAME} WIN32
   click_to_repair.cpp
   Components.hpp
+  GameState.cpp
   GameState.hpp
   Updater.cpp
   Updater.hpp
@@ -11,6 +12,8 @@ add_executable(${TARGET_NAME} WIN32
   utils.hpp
   Constants.cpp
   Constants.hpp
+  Levels.cpp
+  Levels.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 
