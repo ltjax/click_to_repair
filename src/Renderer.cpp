@@ -40,10 +40,22 @@ Color colorForDuration(float duration)
 void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
 {
     auto texture = OGetTexture("bar.png");
-    auto contentRect = shrinkRect(rectangle, Vector2{ 4 });
+    auto contentRect = shrinkRect(rectangle, Vector2{ 2 });
     contentRect.z *= fullness;
     oSpriteBatch->drawRect(nullptr, contentRect, color);
     oSpriteBatch->drawRectScaled9(texture, rectangle, Vector4{8.f});
+}
+
+void renderMachineFrames(entt::registry const& registry)
+{
+    auto frame = OGetTexture("frame.png");
+    auto view = registry.view<Machine const>();
+
+    for (auto entity : view)
+    {
+        auto const& machine = view.get<Machine const>(entity);
+        oSpriteBatch->drawSprite(frame, machine.position);
+    }
 }
 
 void renderDurabilityBar(entt::registry const& registry)
@@ -121,6 +133,7 @@ void Renderer::run()
     oSpriteBatch->begin();
 
     auto& registry = state_.entities;
+    renderMachineFrames(registry);
     renderGears(registry);
     renderDurabilityBar(registry);
     renderRepairiumBar(state_);
