@@ -31,7 +31,8 @@ struct Gear
 
 struct Engine
 {
-  float cam_shaft_angle = 0.f;
+    float cam_shaft_angle = 0.f;
+    float shake = 1.f;
 };
 
 struct HoverState

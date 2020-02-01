@@ -17,11 +17,13 @@ entt::entity createGear(entt::registry& registry, Vector2 position)
 
 entt::entity createEngine(entt::registry& registry, Vector2 position)
 {
-  auto engine = registry.create();
-  registry.assign<Machine>(engine, position, 128.f);
-  registry.assign<Engine>(engine);
-  registry.assign<Durability>(engine, 1.f);
-  return engine;
+    auto engine = registry.create();
+    registry.assign<Machine>(engine, position, 128.f);
+    registry.assign<Quality>(engine, Quality::Good);
+    registry.assign<Engine>(engine);
+    registry.assign<Durability>(engine, 1.f);
+    registry.assign<HoverState>(engine);
+    return engine;
 }
 
 void level0(entt::registry& registry, LevelData& state)

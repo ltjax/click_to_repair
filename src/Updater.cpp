@@ -59,23 +59,40 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
+void updateGearWear(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Durability, Machine, Gear>();
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        durability = std::max(0.f, durability - dt.count() * Constants::GEAR_WEAR_PER_SECOND);
+    }
+}
+
+void updateEngineWear(LevelData& state, std::chrono::duration<float> delta)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Durability, Machine, Engine>();
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+
+        auto wear = view.get<Engine>(entity).shake > 0.f ? 
+            Constants::ENGINE_WEAR_PER_SECOND_SHAKING : 
+            Constants::ENGINE_WEAR_PER_SECOND;
+        durability = std::max(0.f, durability - delta.count() * wear);
+    }
+}
+
 void updateWear(LevelData& state, std::chrono::duration<float> dt)
 {
     if (state.is_repairing)
     {
         return;
     }
-
-    entt::registry& registry = state.entities;
-    auto view = registry.view<Durability, Machine>();
-    bool was_repairing = state.is_repairing;
-    state.started_repairing = false;
-    state.is_repairing = false;
-    for (auto entity : view)
-    {
-        auto& durability = view.get<Durability>(entity).durability;
-        durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
-    }
+    updateGearWear(state, dt);
+    updateEngineWear(state, dt);
 }
 
 void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt, Matrix const& camera)
@@ -138,7 +155,7 @@ void updateHoverSounds(entt::registry& registry)
     }
 }
 
-Quality computeQuality(float durability, float lower, float upper )
+Quality computeQuality(float durability, float lower, float upper)
 {
     if (durability < lower)
     {
@@ -180,6 +197,31 @@ void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
 
         quality = computeQuality(durability, 0.1, 0.5);
     }
+}
+
+
+void updateEngineQuality(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Engine, Durability, Quality>();
+
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<Quality>(entity);
+        auto& engine = view.get<Engine>(entity);
+
+        quality = computeQuality(durability, 0.05, 0.85);
+        if (quality == Quality::Good)
+        {
+            engine.shake = 1.f;
+        }
+        else
+        {
+            engine.shake = std::max(0.f, engine.shake - dt / Constants::ENGINE_SHAKE_DURATION);
+        }
+    }
+
 }
 
 
@@ -248,10 +290,11 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateDurability(level, dt);
     updateWear(level, dt);
     updateGearQuality(level, dt);
+    updateEngineQuality(level, dt);
     updateGlobalQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
-    
+
     if (level.repairium >= 1.0f)
     {
         level.repairium = 1.f;
