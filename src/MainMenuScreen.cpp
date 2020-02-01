@@ -74,11 +74,12 @@ void MainMenuScreen::render()
 
   {
     const auto size_per_level = OScreenWf / Constants::MAX_LEVELS();
+
     for (int level = 0; level < Constants::MAX_LEVELS(); ++level)
     {
       auto rect = get_level_box(level);
-      //Color color = rect.Contains(oInput->mousePosf) ? Color{ 0.7,1.f,0.7,1.f } : Color::White;
       Color color = rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
+
       if (level == progress.next_available_level)
       {
         const auto size = get_level_box_size();
@@ -103,6 +104,27 @@ void MainMenuScreen::render()
         color = Color{ 0.5f, 0.5f, 0.5f, 1.f };
       }
       oSpriteBatch->drawOutterOutlineRect(rect, 5.f, color);
+    }
+  }
+
+  {
+    auto texture_connect = OGetTexture("white_dot.png");
+    auto texture_connect_next = OGetTexture("quality_circle.png");
+    const auto size_per_level = OScreenWf / Constants::MAX_LEVELS();
+    auto padding = 32.f;
+    auto offset = Vector2{ padding, 0.f };
+
+    for (int level = 0; level < progress.next_available_level; ++level)
+    {
+      auto rect = get_level_box(level);
+      auto connect = level == progress.next_available_level -1 ? texture_connect_next : texture_connect;
+      Vector2 connect_pos = rect.Right() + offset;
+      auto stop = (get_level_box(level + 1).Left() - offset).x;
+      auto dist = stop - connect_pos.x;
+      auto num_dots = std::min(3, static_cast<int>(dist / padding));
+      connect_pos.x+= (dist - num_dots * padding) / 2.f + padding / 2.f;
+      for (int dot = 0; dot < num_dots; ++dot)
+        oSpriteBatch->drawSprite(connect, connect_pos + offset * dot, Color::White, onut::Align::Center);
     }
   }
 
