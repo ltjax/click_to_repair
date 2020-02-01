@@ -76,21 +76,21 @@ void updateWear(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
-Quality computeQuality(float averageDurability)
+Quality computeQuality(float durability, float lower, float upper )
 {
-    if (averageDurability < 0.1)
+    if (durability < lower)
     {
         return Quality::Worst;
     }
 
-    if (averageDurability >= 0.8)
+    if (durability >= upper)
     {
         return Quality::Good;
     }
     return Quality::Medium;
 }
 
-void computeMachineState(LevelData& state, std::chrono::duration<float> dt)
+void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability>();
@@ -103,8 +103,23 @@ void computeMachineState(LevelData& state, std::chrono::duration<float> dt)
         min_durability = std::min(min_durability, durability);
     }
 
-    state.quality = computeQuality(min_durability);
+    state.quality = computeQuality(min_durability, 0.1, 0.8);
 }
+
+void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Gear, Durability, Quality>();
+
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<Quality>(entity);
+
+        quality = computeQuality(durability, 0.1, 0.5);
+    }
+}
+
 
 void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
 {
@@ -171,8 +186,8 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(registry, dt);
     updateEngines(registry, dt);
     updateDurability(level, dt);
-    updateWear(level, dt);
-    computeMachineState(level, dt);
+    updateGearQuality(level, dt);
+    updateGlobalQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
 

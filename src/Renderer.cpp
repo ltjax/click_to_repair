@@ -70,19 +70,20 @@ void renderGears(entt::registry const& registry)
     }
 }
 
-Color colorForDuration(float duration)
+Color colorForQuality(Quality quality)
 {
     auto color = OColorRGB(255, 255, 255);
-    if (duration < 0.1f)
+    if (quality == Quality::Worst)
     {
         color = OColorRGB(220, 20, 20);
     }
-    else if (duration < 0.5f)
+    else if (quality == Quality::Medium)
     {
         color = OColorRGB(220, 220, 20);
     }
     return color;
 }
+
 
 void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
 {
@@ -107,19 +108,20 @@ void renderMachineFrames(entt::registry const& registry)
 
 void renderDurabilityBar(entt::registry const& registry)
 {
-    auto view = registry.view<Machine const, Durability const>();
+    auto view = registry.view<Machine const, Durability const, Quality const>();
 
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
         auto durability = view.get<Durability const>(entity).durability;
+        auto quality = view.get<Quality const>(entity);
 
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
         auto barHeight = 10.f;
         auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
-        renderBar(oSpriteBatch, backgroundRect, durability, colorForDuration(durability));
+        renderBar(oSpriteBatch, backgroundRect, durability, colorForQuality(quality));
     }
 }
 
