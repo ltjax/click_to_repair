@@ -13,6 +13,8 @@
 #include <filesystem>
 #include <algorithm>
 #include <entt/entt.hpp>
+#include <onut/Font.h>
+#include "utils.hpp"
 
 struct Durability
 {
@@ -36,6 +38,13 @@ struct Gear
 {
     Matrix rotation;
 };
+
+struct GameState
+{
+    float repairium = 0;
+    float quality = 1.f;
+};
+GameState state;
 
 entt::entity createGear(entt::registry& registry, Vector2 position)
 {
@@ -74,19 +83,54 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 void updateDuration(entt::registry& registry, std::chrono::duration<float> dt)
 {
     auto view = registry.view<Durability, Machine>();
+
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
         auto& durability = view.get<Durability>(entity).durability;
         if (OInputPressed(OMouse1) && machine.getBoundingBox().Contains(oInput->mousePosf))
         {
-            durability = std::min(1.f, durability + dt.count() * 0.15f);
+            auto speed = state.repairium > 0.f ? 0.15f : 0.03f;
+            durability = std::min(1.f, durability + dt.count() * speed);
+            state.repairium = std::max(0.f, state.repairium - dt.count() * 0.2f);
         }
         else
         {
             durability = std::max(0.f, durability - dt.count() * 0.05f);
         }
     }
+}
+
+void updateQuality(entt::registry& registry, std::chrono::duration<float> dt)
+{
+    auto view = registry.view<Durability>();
+
+    float quality = 0.f;
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+
+        quality += durability;
+    }
+    state.quality = quality / view.size();
+}
+
+void updateRepairum(std::chrono::duration<float> dt)
+{
+    if (state.quality < 0.1)
+    {
+        // machine is stopped
+        return;
+    }
+    
+    if (state.quality >= 0.8)
+    {
+        // machine is in SUPER condition and run
+        state.repairium += 0.1 * dt.count();
+    }
+
+    // normal condition
+    state.repairium += 0.05 * state.quality * dt.count();
 }
 
 void renderGears(entt::registry& registry)
@@ -106,6 +150,8 @@ void renderGears(entt::registry& registry)
     }
 }
 
+
+
 void renderDurabilityBar(entt::registry& registry)
 {
     auto view = registry.view<Machine, Durability>();
@@ -113,13 +159,27 @@ void renderDurabilityBar(entt::registry& registry)
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
-        auto const& durability = view.get<Durability>(entity);
+        auto durability = view.get<Durability>(entity).durability;
         
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto rect = Rect{ -halfSize + p.x, -halfSize + p.y - 8, size * durability.durability, 8 };
-        oSpriteBatch->drawRect(nullptr, rect, OColorHex(FF0000));
+        auto barHeight = 10.f; 
+        auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
+        auto contentRect = shrinkRect(backgroundRect, Vector2{1});
+        contentRect.z *= durability;
+        oSpriteBatch->drawRect(nullptr, backgroundRect, Color::White);
+
+        auto color = OColorRGB(88,88,88);
+        if (durability < 0.1f)
+        {
+            color = OColorRGB(220, 20, 20);
+        }
+        else if (durability < 0.5f)
+        {
+            color = OColorRGB(220, 220, 20);
+        }
+        oSpriteBatch->drawRect(nullptr, contentRect, color);
     }
 }
 
@@ -129,6 +189,8 @@ void update()
     auto dt = std::chrono::duration<float>{ODT};
     updateGears(oRegistry, dt);
     updateDuration(oRegistry, dt);
+    updateQuality(oRegistry, dt);
+    updateRepairum(dt);
 
     if (OInputJustPressed(OKeyEscape))
         OQuit();
@@ -150,4 +212,8 @@ void postRender()
 
 void renderUI()
 {
+    auto pFont = OGetFont("main.fnt");
+    pFont->draw("Quality " + std::to_string((int)(state.quality * 100.f)) + "%", { 10, 300 }, OLeft);
+    pFont->draw("Repairum " + std::to_string(state.repairium), { 10, 320 }, OLeft);
+
 }
