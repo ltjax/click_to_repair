@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <entt/entt.hpp>
+#include "utils.hpp"
 
 struct Durability
 {
@@ -106,6 +107,8 @@ void renderGears(entt::registry& registry)
     }
 }
 
+
+
 void renderDurabilityBar(entt::registry& registry)
 {
     auto view = registry.view<Machine, Durability>();
@@ -113,13 +116,27 @@ void renderDurabilityBar(entt::registry& registry)
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
-        auto const& durability = view.get<Durability>(entity);
+        auto durability = view.get<Durability>(entity).durability;
         
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto rect = Rect{ -halfSize + p.x, -halfSize + p.y - 8, size * durability.durability, 8 };
-        oSpriteBatch->drawRect(nullptr, rect, OColorHex(FF0000));
+        auto barHeight = 10.f; 
+        auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
+        auto contentRect = shrinkRect(backgroundRect, Vector2{1});
+        contentRect.z *= durability;
+        oSpriteBatch->drawRect(nullptr, backgroundRect, Color::White);
+
+        auto color = OColorRGB(88,88,88);
+        if (durability < 0.1f)
+        {
+            color = OColorRGB(220, 20, 20);
+        }
+        else if (durability < 0.5f)
+        {
+            color = OColorRGB(220, 220, 20);
+        }
+        oSpriteBatch->drawRect(nullptr, contentRect, color);
     }
 }
 
