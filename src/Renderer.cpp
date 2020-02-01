@@ -111,13 +111,13 @@ void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
 
 void renderDurabilityBar(entt::registry const& registry, Matrix const& camera)
 {
-    auto view = registry.view<Machine const, Durability const, Quality const>();
+    auto view = registry.view<Machine const, Durability const, QualityStatus const>();
 
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
         auto durability = view.get<Durability const>(entity).durability;
-        auto quality = view.get<Quality const>(entity);
+        auto quality = view.get<QualityStatus const>(entity).current;
 
         auto p = Vector2::Transform(machine.position, camera);
         auto size = machine.size;
