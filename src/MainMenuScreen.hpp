@@ -13,5 +13,6 @@ struct MainMenuScreen : Screen
 
   Progress& progress;
   std::optional<int> level_in_focus;
-  OAnimFloat anim_;
+  OAnimFloat anim_current_level_;
+  OAnimFloat anim_main_logo_;
 };

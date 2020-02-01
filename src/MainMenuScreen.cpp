@@ -26,10 +26,17 @@ namespace {
 MainMenuScreen::MainMenuScreen(Progress& progress_)
   : progress(progress_)
 {
-  anim_.play(
+  anim_current_level_.play(
     0.05f, // From
     0.2f, // To
     0.4f, // Duration in Seconds
+    OTweenEaseBoth,
+    OPingPongLoop
+  );
+  anim_main_logo_.play(
+    0.f, // From
+    20.f, // To
+    5.f, // Duration in Seconds
     OTweenEaseBoth,
     OPingPongLoop
   );
@@ -61,8 +68,8 @@ void MainMenuScreen::render()
     auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
     const float targetSize = OScreenHf * 2.f / 3.f;
-    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf,0),
-      Color::White, 0.f, targetSize / textureSize.x, onut::Align::Top);
+    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f),
+      Color::White, anim_main_logo_ - 15.f, targetSize / textureSize.x, onut::Align::Center);
   }
 
   {
@@ -75,7 +82,7 @@ void MainMenuScreen::render()
       if (level == progress.next_available_level)
       {
         const auto size = get_level_box_size();
-        auto diff = (anim_.get() - 0.1f) * size * LEVEL_BOX_SIZE;
+        auto diff = (anim_current_level_.get() - 0.1f) * size * LEVEL_BOX_SIZE;
         rect.x += diff;
         rect.y += diff;
         rect.z -= 2 * diff;
