@@ -39,6 +39,7 @@ Color colorForDuration(float duration)
 
 void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
 {
+    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     auto texture = OGetTexture("bar.png");
     auto contentRect = shrinkRect(rectangle, Vector2{ 4 });
     contentRect.z *= fullness;
@@ -106,7 +107,7 @@ void renderCursor(GameState const& state)
     const float targetSize = 96;
     oRenderer->renderStates.blendMode = OBlendAlpha;
     static float rot_time;
-    auto s = std::isinf(state.repair_time * 7.f);
+    auto s = std::sin(state.repair_time * 7.f);
     float rotation = (s < 0 ? 1.f : -1.f) * (s*s) * 25.f;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
