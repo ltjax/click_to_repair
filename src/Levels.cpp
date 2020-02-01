@@ -47,7 +47,7 @@ LevelFunc levels[] = {
     level1,
     level2,
 };
-constexpr auto MAX_LEVEL = sizeof(levels) / sizeof(levels[0]);
+constexpr auto MAX_LEVEL = std::size(levels);
 namespace Constants
 {
   int MAX_LEVELS()
