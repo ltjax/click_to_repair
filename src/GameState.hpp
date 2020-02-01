@@ -33,7 +33,7 @@ struct IngameScreen : Screen
 
 struct GameState
 {
-    std::unique_ptr<Screen> menu_state = std::make_unique<IngameScreen>(); //std::make_unique<MainMenuScreen>();
+    std::unique_ptr<Screen> menu_state; //std::make_unique<MainMenuScreen>();
 };
 
 void enter_main_menu(GameState&);
