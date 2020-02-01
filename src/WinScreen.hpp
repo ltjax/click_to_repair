@@ -1,7 +1,7 @@
 #pragma once
 #include "Screen.hpp"
 #include <onut/Texture.h>
-#include <onut\Anim.h>
+#include <onut/Anim.h>
 
 struct WinScreen : Screen
 {
