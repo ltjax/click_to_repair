@@ -5,20 +5,30 @@
 #include <onut/Renderer.h>
 #include <onut/Input.h>
 #include "Constants.hpp"
+#include <onut/Model.h>
 
 void renderGears(entt::registry const& registry)
 {
-    auto texture = OGetTexture("gear.png");
+    auto model = OGetModel("gears.obj");
     auto view = registry.view<Machine const, Gear const>();
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
         auto const& gear = view.get<Gear const>(entity);
-
-        auto transform = gear.rotation * Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f);
-        auto textureSize = texture->getSizef();
-
-        oSpriteBatch->drawSprite(texture, transform, Vector2(machine.size / textureSize.x, machine.size / textureSize.y));
+        
+        float const wobbleStrength = 0.2f;
+        float const wobbleAngle = wobbleStrength * std::sin(8.f * gear.delta);
+       
+        auto boundsX = std::abs(model->getBoundingBox()->x);
+        auto scale = machine.size / (2.f * boundsX);
+        
+        auto transform =
+          Matrix::CreateScale(scale) *
+          gear.rotation *
+          Matrix::CreateRotationY(wobbleAngle) * 
+          Matrix::CreateTranslation(machine.position.x, machine.position.y, 0.f);
+        
+        model->render(transform);
     }
 }
 
@@ -126,6 +136,7 @@ void renderCursor(LevelData const& state)
     static float rot_time;
     auto s = std::sin(state.repair_time * 7.f);
     float rotation = (s < 0 ? 1.f : -1.f) * (s * s) * 25.f;
+    oRenderer->renderStates.blendMode = OBlendOpaque;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
@@ -135,13 +146,18 @@ void renderCursor(LevelData const& state)
 
 void Renderer::run()
 {
+    oRenderer->setupFor3D({ 0.f, -1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
+    oRenderer->set2DCamera(Vector2::Zero);
     oRenderer->clear(Constants::BackgroundColor());
-    oSpriteBatch->begin();
+    oRenderer->setAmbient(Color::White);
+    oRenderer->clearDepth();
 
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
-    renderMachineFrames(registry);
     renderGears(registry);
+
+    oSpriteBatch->begin();
+    renderMachineFrames(registry);
     renderDurabilityBar(registry);
     renderRepairiumBar(level);
     renderQualityLights(level);

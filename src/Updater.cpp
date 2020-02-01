@@ -14,6 +14,7 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     {
         auto& gear = view.get<Gear>(entity);
         gear.rotation = Matrix::CreateRotationZ(dt.count()) * gear.rotation;
+        gear.delta += dt.count();
     }
 }
 
