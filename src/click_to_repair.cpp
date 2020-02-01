@@ -33,17 +33,19 @@ void initSettings()
 void init()
 {
     oContentManager->addSearchPath("../../../../assets");
-    gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.progress); // TODO: restore progress from save file?
-    gameState.progress.load();
+    gameState.shared_state = std::make_shared<SharedState>();
+    gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.shared_state); // TODO: restore progress from save file?
+    gameState.shared_state->progress.load();
 }
 
 void update()
 {
     auto dt = std::chrono::duration<float>{ ODT };
-    auto next_state = gameState.menu_state->update(dt);
-    if (next_state)
+    auto next_state_factory = gameState.menu_state->update(dt);
+    if (next_state_factory)
     {
-        gameState.menu_state = std::move(next_state);
+        gameState.menu_state.reset();
+        gameState.menu_state = next_state_factory();
     }
 }
 

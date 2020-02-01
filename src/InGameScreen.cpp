@@ -3,24 +3,24 @@
 #include "WinScreen.hpp"
 #include <onut/Input.h>
 
-InGameScreen::InGameScreen(Progress& progress_, int levelNumber_)
-    : progress(progress_), levelNumber(levelNumber_), level(create_level(levelNumber)), updater(level), renderer(level)
+InGameScreen::InGameScreen(std::shared_ptr<SharedState> sharedState_, int levelNumber_)
+    : sharedState(sharedState_), levelNumber(levelNumber_), level(create_level(levelNumber)), updater(level), renderer(level)
 {
     backgroundMusic = OGetMusic("background_music.ogg");
     backgroundMusic->play();
 }
 
-std::unique_ptr<Screen> InGameScreen::update(std::chrono::duration<float> dt)
+Screen::ScreenFactory InGameScreen::update(std::chrono::duration<float> dt)
 {
     auto finished = updater.run(dt);
 
     if (finished)
     {
-        return std::make_unique<WinScreen>(progress, levelNumber);
+        return [sharedState = sharedState, levelNumber = levelNumber]() {return std::make_unique<WinScreen>(sharedState, levelNumber);};
     }
 
     if (OInputJustPressed(OKeyEscape))
-        return std::make_unique<MainMenuScreen>(progress);
+        return [sharedState = sharedState]() {return std::make_unique<MainMenuScreen>(sharedState); };
 
     return nullptr;
 }

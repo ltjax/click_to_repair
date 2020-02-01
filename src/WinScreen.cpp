@@ -7,11 +7,12 @@
 #include "MainMenuScreen.hpp"
 #include "InGameScreen.hpp"
 
-WinScreen::WinScreen(Progress& progress, int finished_level)
-  : progress_(progress), finished_level_(finished_level)
+WinScreen::WinScreen(std::shared_ptr<SharedState> sharedState, int finished_level)
+  : sharedState_(sharedState), finished_level_(finished_level)
 {
-  progress_.next_available_level = std::max(progress_.next_available_level, finished_level_ + 1);
-  progress_.save();
+    auto& progress_ = sharedState->progress;
+    progress_.next_available_level = std::max(progress_.next_available_level, finished_level_ + 1);
+    progress_.save();
     checkmark_ = OGetTexture("level_complete.png");
     sound_ = OCreateSoundInstance("level_complete.wav");
     sound_->play();
@@ -25,18 +26,17 @@ WinScreen::WinScreen(Progress& progress, int finished_level)
     );
 }
 
-std::unique_ptr<Screen> WinScreen::update(std::chrono::duration<float> dt)
+Screen::ScreenFactory WinScreen::update(std::chrono::duration<float> dt)
 {
     const auto next_level = finished_level_ + 1;
     if (OInputJustPressed(OKeyEscape))
     {
-      return std::make_unique<MainMenuScreen>(progress_);
+        return [state = sharedState_] {return std::make_unique<MainMenuScreen>(state);};
     }
 
     if (OInputJustPressed(OMouse1))
     {
-      return std::make_unique<InGameScreen>(progress_, next_level);
-      //return std::make_unique<MainMenuScreen>(progress_, next_level);
+        return [state = sharedState_, next_level] {return std::make_unique<InGameScreen>(state, next_level);};
     }
 
     return {};

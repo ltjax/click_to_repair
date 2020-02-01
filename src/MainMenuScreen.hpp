@@ -7,16 +7,12 @@
 
 struct MainMenuScreen : Screen
 {
-  MainMenuScreen(Progress& progress_) : progress(progress_)
-  {
-    backgroundMusic = OGetMusic("background_music.ogg");
-    backgroundMusic->play();
-  }
+  MainMenuScreen(std::shared_ptr<SharedState> sharedState);
+  ScreenFactory update(std::chrono::duration<float> dt) override;
 
-  std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
   void render() override;
 
-  Progress& progress;
+  std::shared_ptr<SharedState> sharedState;
   std::optional<int> level_in_focus;
 
   OAnimFloat anim_current_level_;

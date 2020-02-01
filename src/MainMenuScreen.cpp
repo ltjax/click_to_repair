@@ -21,10 +21,19 @@ namespace {
     return { initial_offset + (level_index + LEVEL_BOX_OFFSET) * size_per_level, OScreenHf - (LEVEL_BOX_OFFSET + LEVEL_BOX_SIZE ) * size_per_level,
       size_per_level * LEVEL_BOX_SIZE, size_per_level * LEVEL_BOX_SIZE };
   }
+  Rect get_exit_rect()
+  {
+    Vector2 size(96);
+    return { OScreenWf - size.x, 0, size };
+  }
+  Color get_color_focus(Rect const& rect)
+  {
+    return rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
+  }
 }
 
-MainMenuScreen::MainMenuScreen(Progress& progress_)
-  : progress(progress_)
+MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
+  : sharedState(sharedState_)
 {
   anim_current_level_.play(
     0.05f, // From
@@ -40,24 +49,30 @@ MainMenuScreen::MainMenuScreen(Progress& progress_)
     OTweenEaseBoth,
     OPingPongLoop
   );
+  backgroundMusic = OGetMusic("background_music.ogg");
+  backgroundMusic->play();
 }
 
-std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
+Screen::ScreenFactory MainMenuScreen::update(std::chrono::duration<float> dt)
 {
   if (OInputJustPressed(OKeyEscape))
   {
-    OQuit();
-    return nullptr;
+      OQuit();
+      return {};
   }
 
   if (OInputPressed(OMouse1))
   {
-    for (int level = 0; level <= progress.next_available_level; ++level)
-      if (get_level_box(level).Contains(oInput->mousePosf))
-        return std::make_unique<InGameScreen>(progress, level);
+      auto const& progress = sharedState->progress;
+      for (int level = 0; level <= progress.next_available_level; ++level)
+          if (get_level_box(level).Contains(oInput->mousePosf))
+              return [sharedState = sharedState, level = level]() {return std::make_unique<InGameScreen>(sharedState, level);};
+
+    if (get_exit_rect().Contains(oInput->mousePosf))
+      OQuit();
   }
 
-  return nullptr;
+  return {};
 }
 
 void MainMenuScreen::render()
@@ -68,17 +83,18 @@ void MainMenuScreen::render()
     auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
     const float targetSize = OScreenHf * 2.f / 3.f;
-    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f),
+    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f + 32.f),
       Color::White, anim_main_logo_ - 15.f, targetSize / textureSize.x, onut::Align::Center);
   }
 
   {
     const auto size_per_level = OScreenWf / Constants::MAX_LEVELS();
 
+    auto& progress = sharedState->progress;
     for (int level = 0; level < Constants::MAX_LEVELS(); ++level)
     {
       auto rect = get_level_box(level);
-      Color color = rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
+      Color color = get_color_focus(rect);
 
       if (level == progress.next_available_level)
       {
@@ -114,6 +130,7 @@ void MainMenuScreen::render()
     auto padding = 32.f;
     auto offset = Vector2{ padding, 0.f };
 
+    auto& progress = sharedState->progress;
     for (int level = 0, level_end = std::min(progress.next_available_level, Constants::MAX_LEVELS()-1); level < level_end; ++level)
     {
       auto rect = get_level_box(level);
@@ -126,6 +143,10 @@ void MainMenuScreen::render()
       for (int dot = 0; dot < num_dots; ++dot)
         oSpriteBatch->drawSprite(connect, connect_pos + offset * dot, Color::White, onut::Align::Center);
     }
+  }
+
+  {
+    oSpriteBatch->drawRect(OGetTexture("exit.png"), get_exit_rect(), get_color_focus(get_exit_rect()));
   }
 
   oSpriteBatch->end();
