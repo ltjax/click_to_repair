@@ -21,6 +21,15 @@ namespace {
     return { initial_offset + (level_index + LEVEL_BOX_OFFSET) * size_per_level, OScreenHf - (LEVEL_BOX_OFFSET + LEVEL_BOX_SIZE ) * size_per_level,
       size_per_level * LEVEL_BOX_SIZE, size_per_level * LEVEL_BOX_SIZE };
   }
+  Rect get_exit_rect()
+  {
+    Vector2 size(96);
+    return { OScreenWf - size.x, 0, size };
+  }
+  Color get_color_focus(Rect const& rect)
+  {
+    return rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
+  }
 }
 
 MainMenuScreen::MainMenuScreen(Progress& progress_)
@@ -55,6 +64,9 @@ std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
     for (int level = 0; level <= progress.next_available_level; ++level)
       if (get_level_box(level).Contains(oInput->mousePosf))
         return std::make_unique<InGameScreen>(progress, level);
+
+    if (get_exit_rect().Contains(oInput->mousePosf))
+      OQuit();
   }
 
   return nullptr;
@@ -78,7 +90,7 @@ void MainMenuScreen::render()
     for (int level = 0; level < Constants::MAX_LEVELS(); ++level)
     {
       auto rect = get_level_box(level);
-      Color color = rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
+      Color color = get_color_focus(rect);
 
       if (level == progress.next_available_level)
       {
@@ -126,6 +138,10 @@ void MainMenuScreen::render()
       for (int dot = 0; dot < num_dots; ++dot)
         oSpriteBatch->drawSprite(connect, connect_pos + offset * dot, Color::White, onut::Align::Center);
     }
+  }
+
+  {
+    oSpriteBatch->drawRect(OGetTexture("exit.png"), get_exit_rect(), get_color_focus(get_exit_rect()));
   }
 
   oSpriteBatch->end();
