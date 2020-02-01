@@ -13,7 +13,7 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     }
 }
 
-void updateDuration(GameState& state, std::chrono::duration<float> dt)
+void updateDurability(GameState& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability, Machine>();
@@ -26,11 +26,12 @@ void updateDuration(GameState& state, std::chrono::duration<float> dt)
         {
             auto speed = state.repairium > 0.f ? 0.15f : 0.03f;
             durability = std::min(1.f, durability + dt.count() * speed);
-            state.repairium = std::max(0.f, state.repairium - dt.count() * 0.2f);
+            state.is_repairing = true;
         }
         else
         {
             durability = std::max(0.f, durability - dt.count() * 0.05f);
+            state.is_repairing = false;
         }
     }
 }
@@ -68,6 +69,14 @@ void updateQuality(GameState& state, std::chrono::duration<float> dt)
 
 void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 {
+    if (state.is_repairing)
+    {
+        state.repairium = std::max(0.f, state.repairium - dt.count() * 0.2f);
+        state.repair_time += dt.count();
+    }
+    else
+        state.repair_time = 0.f;
+
     if (state.quality == Quality::Worst)
     {
         // machine is stopped
@@ -95,7 +104,7 @@ void Updater::run(std::chrono::duration<float> dt)
 {
     auto& registry = state_.entities;
     updateGears(registry, dt);
-    updateDuration(state_, dt);
+    updateDurability(state_, dt);
     updateQuality(state_, dt);
     updateRepairum(state_, dt);
     

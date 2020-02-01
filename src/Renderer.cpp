@@ -3,6 +3,7 @@
 #include <onut/Texture.h>
 #include "Components.hpp"
 #include <onut/Renderer.h>
+#include <onut/Input.h>
 #include "Constants.hpp"
 
 void renderGears(entt::registry const& registry)
@@ -22,22 +23,28 @@ void renderGears(entt::registry const& registry)
     }
 }
 
-void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness)
+Color colorForDuration(float duration)
 {
-    auto contentRect = shrinkRect(rectangle, Vector2{ 1 });
-    contentRect.z *= fullness;
-    oSpriteBatch->drawRect(nullptr, rectangle, Color::White);
-
-    auto color = OColorRGB(88, 88, 88);
-    if (fullness < 0.1f)
+    auto color = OColorRGB(255, 255, 255);
+    if (duration < 0.1f)
     {
         color = OColorRGB(220, 20, 20);
     }
-    else if (fullness < 0.5f)
+    else if (duration < 0.5f)
     {
         color = OColorRGB(220, 220, 20);
     }
+    return color;
+}
+
+void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
+{
+    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
+    auto texture = OGetTexture("bar.png");
+    auto contentRect = shrinkRect(rectangle, Vector2{ 4 });
+    contentRect.z *= fullness;
     oSpriteBatch->drawRect(nullptr, contentRect, color);
+    oSpriteBatch->drawRectScaled9(texture, rectangle, Vector4{8.f});
 }
 
 void renderDurabilityBar(entt::registry const& registry)
@@ -52,19 +59,19 @@ void renderDurabilityBar(entt::registry const& registry)
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto barHeight = 10.f;
+        auto barHeight = 20.f;
         auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
-        renderBar(oSpriteBatch, backgroundRect, durability);
+        renderBar(oSpriteBatch, backgroundRect, durability, colorForDuration(durability));
     }
 }
 
 void renderRepairiumBar(GameState const& state)
 {
-    auto barHeight = 32.f;
+    auto barHeight = 36.f;
     auto screenSize = OScreenf;
     auto rect = Rect{0.f, screenSize.y - barHeight, screenSize.x, barHeight};
     rect = shrinkRect(rect, Vector2{8.f});
-    renderBar(oSpriteBatch, rect, state.repairium);
+    renderBar(oSpriteBatch, rect, state.repairium, Color::White);
 }
 
 void renderQualityLights(GameState const& state)
@@ -86,6 +93,33 @@ void renderQualityLights(GameState const& state)
     oSpriteBatch->drawSprite(texture, Matrix::CreateTranslation(positionRight), scale, quality == Quality::Good ? OColorRGB(0, 255, 0) : OColorRGB(0, 75, 0));
 }
 
+decltype(OGetTexture("")) icon_wrench;
+
+void renderCursor(GameState const& state)
+{
+    oInput->setMouseVisible(!state.is_repairing);
+
+    if (!state.is_repairing)
+        return;
+
+    auto textureSize = icon_wrench->getSizef();
+
+    const float targetSize = 96;
+    oRenderer->renderStates.blendMode = OBlendAlpha;
+    static float rot_time;
+    auto s = std::sin(state.repair_time * 7.f);
+    float rotation = (s < 0 ? 1.f : -1.f) * (s*s) * 25.f;
+    oSpriteBatch->drawSprite(icon_wrench,
+        oInput->mousePosf,
+        Color::White, rotation, targetSize / textureSize.x,
+        Vector2(0.1f, 0.1f));
+}
+
+void Renderer::init()
+{
+    icon_wrench = OGetTexture("wrench.png");
+}
+
 void Renderer::run()
 {
     oRenderer->clear(Constants::BackgroundColor());
@@ -96,6 +130,7 @@ void Renderer::run()
     renderDurabilityBar(registry);
     renderRepairiumBar(state_);
     renderQualityLights(state_);
+    renderCursor(state_); // should be called last, so it is rendered on top
 
     oSpriteBatch->end();
 }
