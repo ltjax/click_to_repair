@@ -66,6 +66,25 @@ void renderRepairiumBar(GameState const& state)
     renderBar(oSpriteBatch, rect, state.repairium);
 }
 
+void renderQualityLights(GameState const& state)
+{
+    auto screenSize = OScreenf;
+    auto texture = OGetTexture("white_dot.png");
+    auto size = 24.f;
+    auto padding = 32.f;
+    auto scale = inverseComponents(texture->getSizef()) * size;
+
+    auto offset = Vector2{padding + size, 0.f};
+    Vector2 positionCenter{screenSize.x / 2.f, size / 2.f + padding};
+    Vector2 positionLeft = positionCenter - offset;
+    Vector2 positionRight = positionCenter + offset;
+    
+    auto quality = state.quality;
+    oSpriteBatch->drawSprite(texture, Matrix::CreateTranslation(positionLeft), scale, quality == Quality::Worst ? OColorRGB(255, 0, 0) : OColorRGB(75, 0, 0) );
+    oSpriteBatch->drawSprite(texture, Matrix::CreateTranslation(positionCenter), scale, quality == Quality::Medium ? OColorRGB(255, 255, 0) : OColorRGB(75, 75, 0));
+    oSpriteBatch->drawSprite(texture, Matrix::CreateTranslation(positionRight), scale, quality == Quality::Good ? OColorRGB(0, 255, 0) : OColorRGB(0, 75, 0));
+}
+
 void Renderer::run()
 {
     oRenderer->clear(OColorHex(556677));
@@ -75,6 +94,7 @@ void Renderer::run()
     renderGears(registry);
     renderDurabilityBar(registry);
     renderRepairiumBar(state_);
+    renderQualityLights(state_);
 
     oSpriteBatch->end();
 }

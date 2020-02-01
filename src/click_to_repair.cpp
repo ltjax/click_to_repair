@@ -67,6 +67,5 @@ void postRender()
 void renderUI()
 {
     auto pFont = OGetFont("main.fnt");
-    pFont->draw("Quality " + std::to_string((int)(gameState.quality * 100.f)) + "%", { 10, 300 }, OLeft);
     pFont->draw("Repairum " + std::to_string(gameState.repairium), { 10, 320 }, OLeft);
 }

@@ -35,6 +35,20 @@ void updateDuration(GameState& state, std::chrono::duration<float> dt)
     }
 }
 
+Quality computeQuality(float averageDurability)
+{
+    if (averageDurability < 0.1)
+    {
+        return Quality::Worst;
+    }
+
+    if (averageDurability >= 0.8)
+    {
+        return Quality::Good;
+    }
+    return Quality::Medium;
+}
+
 void updateQuality(GameState& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
@@ -47,25 +61,34 @@ void updateQuality(GameState& state, std::chrono::duration<float> dt)
 
         quality += durability;
     }
-    state.quality = quality / view.size();
+
+    auto averageDurability = quality / view.size();
+    state.quality = computeQuality(averageDurability);
 }
 
 void updateRepairum(GameState& state, std::chrono::duration<float> dt)
 {
-    if (state.quality < 0.1)
+    if (state.quality == Quality::Worst)
     {
         // machine is stopped
         return;
     }
 
-    if (state.quality >= 0.8)
+    if (state.quality == Quality::Good)
     {
         // machine is in SUPER condition and run
-        state.repairium += 0.1 * dt.count();
+        state.repairium += 0.1f * dt.count();
+        return;
     }
 
     // normal condition
-    state.repairium += 0.05 * state.quality * dt.count();
+    state.repairium += 0.05f * dt.count();
+
+    if (state.repairium >= 1.f)
+    {
+        // TODO: Win condition here!
+        state.repairium = 1.f;
+    }
 }
 
 void Updater::run(std::chrono::duration<float> dt)

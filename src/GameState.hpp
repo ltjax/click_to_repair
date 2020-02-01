@@ -1,9 +1,16 @@
 #pragma once
 #include <entt/entt.hpp>
 
+enum class Quality
+{
+    Worst,
+    Medium,
+    Good
+};
+
 struct GameState
 {
     float repairium = 0;
-    float quality = 1.f;
+    Quality quality = Quality::Good;
     entt::registry entities;
 };
