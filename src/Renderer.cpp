@@ -3,6 +3,7 @@
 #include <onut/Texture.h>
 #include "Components.hpp"
 #include <onut/Renderer.h>
+#include "Constants.hpp"
 
 void renderGears(entt::registry const& registry)
 {
@@ -87,7 +88,7 @@ void renderQualityLights(GameState const& state)
 
 void Renderer::run()
 {
-    oRenderer->clear(OColorHex(556677));
+    oRenderer->clear(Constants::BackgroundColor());
     oSpriteBatch->begin();
 
     auto& registry = state_.entities;

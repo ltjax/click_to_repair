@@ -6,6 +6,8 @@ add_executable(${TARGET_NAME} WIN32
   Updater.hpp
   Renderer.cpp
   Renderer.hpp
+  Constants.cpp
+  Constants.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 

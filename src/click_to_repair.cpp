@@ -45,8 +45,7 @@ void init()
 
     oContentManager->addSearchPath("../../../../assets");
 
-    createGear(registry, OScreenCenterf / 2.0f);
-    createGear(registry, OScreenCenterf + OScreenCenterf / 2.0f);
+    createGear(registry, OScreenCenterf);
 }
 
 void update()
@@ -66,6 +65,4 @@ void postRender()
 
 void renderUI()
 {
-    auto pFont = OGetFont("main.fnt");
-    pFont->draw("Repairum " + std::to_string(gameState.repairium), { 10, 320 }, OLeft);
 }
