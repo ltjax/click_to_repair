@@ -5,9 +5,12 @@
 #include <onut/SpriteBatch.h>
 #include "Constants.hpp"
 #include "MainMenuScreen.hpp"
+#include "InGameScreen.hpp"
 
-WinScreen::WinScreen()
+WinScreen::WinScreen(Progress& progress, int finished_level)
+  : progress_(progress), finished_level_(finished_level)
 {
+  progress_.next_available_level = std::max(progress_.next_available_level, finished_level_ + 1);
     checkmark_ = OGetTexture("level_complete.png");
 
     anim_.play(
@@ -21,16 +24,16 @@ WinScreen::WinScreen()
 
 std::unique_ptr<Screen> WinScreen::update(std::chrono::duration<float> dt)
 {
-
+    const auto next_level = finished_level_ + 1;
     if (OInputJustPressed(OKeyEscape))
     {
-        OQuit();
-        return nullptr;
+      return std::make_unique<MainMenuScreen>(progress_);
     }
 
     if (OInputJustPressed(OMouse1))
     {
-        return std::make_unique<MainMenuScreen>();
+      return std::make_unique<InGameScreen>(progress_, next_level);
+      //return std::make_unique<MainMenuScreen>(progress_, next_level);
     }
 
     return {};

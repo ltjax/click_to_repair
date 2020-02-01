@@ -11,4 +11,5 @@ namespace Constants
     inline constexpr auto REPAIR_UP_FRONT_COST = 0.05f;
 
     inline constexpr auto WEAR_PER_SECOND = 0.10f;
+    int MAX_LEVELS(); // NOTE: Implementation of this is in Levels.cpp!
 }

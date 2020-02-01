@@ -19,6 +19,7 @@
 #include "Updater.hpp"
 #include "Renderer.hpp"
 #include "Components.hpp"
+#include "MainMenuScreen.hpp"
 #include "InGameScreen.hpp"
 
 // Global game state
@@ -32,7 +33,7 @@ void initSettings()
 void init()
 {
     oContentManager->addSearchPath("../../../../assets");
-    gameState.menu_state = std::make_unique<InGameScreen>(1);
+    gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.progress); // TODO: restore progress from save file?
 }
 
 void update()

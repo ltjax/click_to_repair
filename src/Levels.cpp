@@ -1,5 +1,6 @@
 #include "Levels.hpp"
 #include "Components.hpp"
+#include "Constants.hpp"
 #include <onut/Renderer.h>
 
 entt::entity createGear(entt::registry& registry, Vector2 position)
@@ -47,6 +48,13 @@ LevelFunc levels[] = {
     level2,
 };
 constexpr auto MAX_LEVEL = sizeof(levels) / sizeof(levels[0]);
+namespace Constants
+{
+  int MAX_LEVELS()
+  {
+    return MAX_LEVEL;
+  }
+}
 
 void setup_level(LevelData& level, int level_index)
 {
