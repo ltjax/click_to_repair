@@ -23,20 +23,19 @@ entt::entity createEngine(entt::registry& registry, Vector2 position, float dura
     registry.assign<Engine>(engine);
     registry.assign<Durability>(engine, durability);
     registry.assign<HoverState>(engine);
-    registry.assign<HoverSound>(engine, OCreateSoundInstance("ambient_machine1.wav"));
     return engine;
 }
 
-entt::entity createHamster(entt::registry& registry, Vector2 position)
+entt::entity createHamster(entt::registry& registry, Vector2 position, float durability)
 {
-  auto hamster = registry.create();
-  registry.assign<Machine>(hamster, position, 128.f);
-  registry.assign<Hamster>(hamster);
-  registry.assign<Durability>(hamster, 1.f);
-  registry.assign<HoverState>(hamster);
-  registry.assign<HoverSound>(hamster, OCreateSoundInstance("hamster.wav"));
-  registry.assign<Quality>(hamster, Quality::Good);
-  return hamster;
+    auto hamster = registry.create();
+    registry.assign<Machine>(hamster, position, 128.f);
+    registry.assign<Hamster>(hamster);
+    registry.assign<Durability>(hamster, durability);
+    registry.assign<HoverState>(hamster);
+    registry.assign<QualityStatus>(hamster);
+    registry.assign<HoverSound>(hamster, OCreateSoundInstance("hamster.wav"));
+    return hamster;
 }
 
 void level0(entt::registry& registry, LevelData& state)
@@ -56,11 +55,31 @@ void level2(entt::registry& registry, LevelData& state)
     createEngine(registry, Vector2(150, 0), 1.f);
 }
 
+void level3(entt::registry& registry, LevelData& state)
+{
+    createEngine(registry, Vector2(-300.f, 0.f), 1.f);
+    createHamster(registry, Vector2(0.f, 0.f), 0.75f);
+    createEngine(registry, Vector2(300.f, 0.f), 1.f);
+}
+
+void level4(entt::registry& registry, LevelData& state)
+{
+    float x = 160.f;
+    float y = 125.f;
+    createEngine(registry, Vector2(-x, -y), 1.f);
+    createGear(registry, Vector2(-x, y), 0.75f);
+    createGear(registry, Vector2(x, -y), 0.75f);
+    createHamster(registry, Vector2(x, y), 1.0f);
+    state.reparium_multiplier = 1.2f;
+}
+
 using LevelFunc = void (*)(entt::registry&, LevelData&);
 LevelFunc levels[] = {
     level0,
     level1,
     level2,
+    level3,
+    level4,
 };
 constexpr auto MAX_LEVEL = std::size(levels);
 namespace Constants

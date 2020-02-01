@@ -4,7 +4,10 @@
 
 struct Progress
 {
-  int next_available_level = 100;
+  int next_available_level = 0;
+
+  void load();
+  void save();
 };
 
 struct GameState
@@ -12,5 +15,3 @@ struct GameState
   std::unique_ptr<Screen> menu_state;
   Progress progress;
 };
-
-void enter_main_menu(GameState&);

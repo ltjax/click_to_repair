@@ -56,5 +56,7 @@ struct QualityStatus
 
 struct Hamster 
 {
-  float delta = 0.f;
+    float delta = 0.f;
+    std::chrono::duration<float> nextHiccup;
+    float decay = 0.f;
 };
