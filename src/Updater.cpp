@@ -21,7 +21,9 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
     auto view = registry.view<Durability, Machine>();
+    bool was_repairing = state.is_repairing;
     state.started_repairing = false;
+    state.is_repairing = false;
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine>(entity);
@@ -34,17 +36,17 @@ void updateDurability(LevelData& state, std::chrono::duration<float> dt)
 
             durability = std::min(1.f, durability + dt.count() * speed);
 
-            if (!state.is_repairing)
-            {
-                state.started_repairing = true;
-            }
             state.is_repairing = true;
         }
         else
         {
             durability = std::max(0.f, durability - dt.count() * Constants::WEAR_PER_SECOND);
-            state.is_repairing = false;
         }
+    }
+    
+    if (!was_repairing)
+    {
+        state.started_repairing = true;
     }
 }
 

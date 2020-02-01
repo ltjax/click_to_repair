@@ -32,7 +32,7 @@ void initSettings()
 void init()
 {
     oContentManager->addSearchPath("../../../../assets");
-    gameState.menu_state = std::make_unique<InGameScreen>(0);
+    gameState.menu_state = std::make_unique<InGameScreen>(1);
 }
 
 void update()
