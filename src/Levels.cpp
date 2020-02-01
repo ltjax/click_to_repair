@@ -35,6 +35,7 @@ entt::entity createHamster(entt::registry& registry, Vector2 position)
   registry.assign<Durability>(hamster, 1.f);
   registry.assign<HoverState>(hamster);
   registry.assign<QualityStatus>(hamster);
+  registry.assign<HoverSound>(hamster, OCreateSoundInstance("hamster.wav"));
   return hamster;
 }
 
