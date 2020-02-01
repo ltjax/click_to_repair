@@ -1,6 +1,7 @@
 #include "Updater.hpp"
 #include "Components.hpp"
 #include <onut/Input.h>
+#include <onut/onut.h>
 
 void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
 {
@@ -74,5 +75,7 @@ void Updater::run(std::chrono::duration<float> dt)
     updateDuration(state, dt);
     updateQuality(state, dt);
     updateRepairum(state, dt);
-
+    
+    if (OInputJustPressed(OKeyEscape))
+        OQuit();
 }

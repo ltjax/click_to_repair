@@ -4,6 +4,8 @@ add_executable(${TARGET_NAME} WIN32
   click_to_repair.cpp
   Updater.cpp
   Updater.hpp
+  Renderer.cpp
+  Renderer.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 
