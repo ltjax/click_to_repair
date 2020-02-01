@@ -25,7 +25,7 @@ struct Machine
 {
     Vector2 position;
     float size = 128.f;
-    
+
     Rect getBoundingBox() const
     {
         auto halfSize = size * 0.5f;
@@ -66,7 +66,7 @@ void init()
 {
     oContentManager->addSearchPath("../../../../assets");
 
-    createGear(oRegistry, OScreenCenterf / 2.0f);    
+    createGear(oRegistry, OScreenCenterf / 2.0f);
     createGear(oRegistry, OScreenCenterf + OScreenCenterf / 2.0f);
 }
 
@@ -75,7 +75,7 @@ void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
     auto view = registry.view<Gear>();
     for (auto entity : view)
     {
-        auto& gear = view.get<Gear>(entity);        
+        auto& gear = view.get<Gear>(entity);
         gear.rotation = Matrix::CreateRotationZ(dt.count()) * gear.rotation;
     }
 }
@@ -122,7 +122,7 @@ void updateRepairum(std::chrono::duration<float> dt)
         // machine is stopped
         return;
     }
-    
+
     if (state.quality >= 0.8)
     {
         // machine is in SUPER condition and run
@@ -150,7 +150,23 @@ void renderGears(entt::registry& registry)
     }
 }
 
+void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness)
+{
+    auto contentRect = shrinkRect(rectangle, Vector2{ 1 });
+    contentRect.z *= fullness;
+    oSpriteBatch->drawRect(nullptr, rectangle, Color::White);
 
+    auto color = OColorRGB(88, 88, 88);
+    if (fullness < 0.1f)
+    {
+        color = OColorRGB(220, 20, 20);
+    }
+    else if (fullness < 0.5f)
+    {
+        color = OColorRGB(220, 220, 20);
+    }
+    oSpriteBatch->drawRect(nullptr, contentRect, color);
+}
 
 void renderDurabilityBar(entt::registry& registry)
 {
@@ -160,33 +176,29 @@ void renderDurabilityBar(entt::registry& registry)
     {
         auto const& machine = view.get<Machine>(entity);
         auto durability = view.get<Durability>(entity).durability;
-        
+
         auto p = machine.position;
         auto size = machine.size;
         auto halfSize = size * 0.5f;
-        auto barHeight = 10.f; 
+        auto barHeight = 10.f;
         auto backgroundRect = Rect{ -halfSize + p.x, -halfSize + p.y - barHeight, size, barHeight };
-        auto contentRect = shrinkRect(backgroundRect, Vector2{1});
-        contentRect.z *= durability;
-        oSpriteBatch->drawRect(nullptr, backgroundRect, Color::White);
-
-        auto color = OColorRGB(88,88,88);
-        if (durability < 0.1f)
-        {
-            color = OColorRGB(220, 20, 20);
-        }
-        else if (durability < 0.5f)
-        {
-            color = OColorRGB(220, 220, 20);
-        }
-        oSpriteBatch->drawRect(nullptr, contentRect, color);
+        renderBar(oSpriteBatch, backgroundRect, durability);
     }
+}
+
+void renderRepairiumBar(GameState const& state)
+{
+    auto barHeight = 32.f;
+    auto screenSize = OScreenf;
+    auto rect = Rect{0.f, screenSize.y - barHeight, screenSize.x, barHeight};
+    rect = shrinkRect(rect, Vector2{8.f});
+    renderBar(oSpriteBatch, rect, state.repairium);
 }
 
 
 void update()
 {
-    auto dt = std::chrono::duration<float>{ODT};
+    auto dt = std::chrono::duration<float>{ ODT };
     updateGears(oRegistry, dt);
     updateDuration(oRegistry, dt);
     updateQuality(oRegistry, dt);
@@ -203,6 +215,8 @@ void render()
     oSpriteBatch->begin();
     renderGears(oRegistry);
     renderDurabilityBar(oRegistry);
+    renderRepairiumBar(state);
+
     oSpriteBatch->end();
 }
 
