@@ -172,12 +172,6 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 
     // normal condition
     state.repairium += 0.05f * dt.count();
-
-    if (state.repairium >= 1.0f)
-    {
-        state.repairium = 1.f;
-        state.won_level = true;
-    }
 }
 
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
@@ -186,10 +180,17 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(registry, dt);
     updateEngines(registry, dt);
     updateDurability(level, dt);
+    updateWear(level, dt);
     updateGearQuality(level, dt);
     updateGlobalQuality(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
+    
+    if (level.repairium >= 1.0f)
+    {
+        level.repairium = 1.f;
+        level.won_level = true;
+    }
 
     if (level.won_level)
     {
