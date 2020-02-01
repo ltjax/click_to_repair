@@ -6,6 +6,8 @@
 InGameScreen::InGameScreen(Progress& progress_, int levelNumber_)
     : progress(progress_), levelNumber(levelNumber_), level(create_level(levelNumber)), updater(level), renderer(level)
 {
+    backgroundMusic = OGetMusic("background_music.ogg");
+    backgroundMusic->play();
 }
 
 std::unique_ptr<Screen> InGameScreen::update(std::chrono::duration<float> dt)
@@ -26,4 +28,9 @@ std::unique_ptr<Screen> InGameScreen::update(std::chrono::duration<float> dt)
 void InGameScreen::render()
 {
     renderer.run();
+}
+
+InGameScreen::~InGameScreen()
+{
+    backgroundMusic->stop();
 }

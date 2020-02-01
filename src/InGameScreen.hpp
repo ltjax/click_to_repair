@@ -16,4 +16,6 @@ struct InGameScreen : Screen
     LevelData level;
     Updater updater;
     Renderer renderer;
+
+    ~InGameScreen();
 };
