@@ -10,7 +10,9 @@ enum class Quality
 
 struct GameState
 {
-    float repairium = 0;
+    float repairium = 0.f;
     Quality quality = Quality::Good;
     entt::registry entities;
+    bool is_repairing = false;
+    float repair_time = 0.f;
 };

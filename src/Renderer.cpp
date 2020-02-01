@@ -3,6 +3,7 @@
 #include <onut/Texture.h>
 #include "Components.hpp"
 #include <onut/Renderer.h>
+#include <onut/Input.h>
 #include "Constants.hpp"
 
 void renderGears(entt::registry const& registry)
@@ -91,6 +92,29 @@ void renderQualityLights(GameState const& state)
     oSpriteBatch->drawSprite(texture, Matrix::CreateTranslation(positionRight), scale, quality == Quality::Good ? OColorRGB(0, 255, 0) : OColorRGB(0, 75, 0));
 }
 
+decltype(OGetTexture("")) icon_wrench;
+
+void renderCursor(GameState const& state)
+{
+    auto textureSize = icon_wrench->getSizef();
+
+    const float targetSize = 96;
+    oRenderer->renderStates.blendMode = OBlendAlpha;
+    static float rot_time;
+    auto s = std::sinf(state.repair_time * 7.f);
+    float rotation = state.is_repairing ? (s < 0 ? 1.f : -1.f) * (s*s) * 25.f : 0.f;
+    oSpriteBatch->drawSprite(icon_wrench,
+        oInput->mousePosf,
+        Color::White, rotation, targetSize / textureSize.x,
+        Vector2(0.1f, 0.1f));
+}
+
+void Renderer::init()
+{
+    icon_wrench = OGetTexture("wrench.png");
+    oInput->setMouseVisible(false);
+}
+
 void Renderer::run()
 {
     oRenderer->clear(Constants::BackgroundColor());
@@ -101,6 +125,7 @@ void Renderer::run()
     renderDurabilityBar(registry);
     renderRepairiumBar(state_);
     renderQualityLights(state_);
+    renderCursor(state_); // should be called last, so it is rendered on top
 
     oSpriteBatch->end();
 }
