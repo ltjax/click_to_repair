@@ -23,8 +23,8 @@ namespace {
   }
 }
 
-MainMenuScreen::MainMenuScreen(Progress& progress_)
-  : progress(progress_)
+MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
+  : sharedState(sharedState_)
 {
   anim_current_level_.play(
     0.05f, // From
@@ -42,22 +42,23 @@ MainMenuScreen::MainMenuScreen(Progress& progress_)
   );
 }
 
-std::unique_ptr<Screen> MainMenuScreen::update(std::chrono::duration<float> dt)
+Screen::ScreenFactory MainMenuScreen::update(std::chrono::duration<float> dt)
 {
   if (OInputJustPressed(OKeyEscape))
   {
-    OQuit();
-    return nullptr;
+      OQuit();
+      return {};
   }
 
   if (OInputPressed(OMouse1))
   {
-    for (int level = 0; level <= progress.next_available_level; ++level)
-      if (get_level_box(level).Contains(oInput->mousePosf))
-        return std::make_unique<InGameScreen>(progress, level);
+      auto const& progress = sharedState->progress;
+      for (int level = 0; level <= progress.next_available_level; ++level)
+          if (get_level_box(level).Contains(oInput->mousePosf))
+              return [sharedState = sharedState, level = level]() {return std::make_unique<InGameScreen>(sharedState, level);};
   }
 
-  return nullptr;
+  return {};
 }
 
 void MainMenuScreen::render()
@@ -75,6 +76,7 @@ void MainMenuScreen::render()
   {
     const auto size_per_level = OScreenWf / Constants::MAX_LEVELS();
 
+    auto& progress = sharedState->progress;
     for (int level = 0; level < Constants::MAX_LEVELS(); ++level)
     {
       auto rect = get_level_box(level);
@@ -114,6 +116,7 @@ void MainMenuScreen::render()
     auto padding = 32.f;
     auto offset = Vector2{ padding, 0.f };
 
+    auto& progress = sharedState->progress;
     for (int level = 0, level_end = std::min(progress.next_available_level, Constants::MAX_LEVELS()-1); level < level_end; ++level)
     {
       auto rect = get_level_box(level);

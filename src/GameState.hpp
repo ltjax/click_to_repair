@@ -10,8 +10,13 @@ struct Progress
   void save();
 };
 
+struct SharedState
+{
+  Progress progress;
+};
+
 struct GameState
 {
   std::unique_ptr<Screen> menu_state;
-  Progress progress;
+  std::shared_ptr<SharedState> shared_state;
 };

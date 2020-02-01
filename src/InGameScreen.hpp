@@ -7,11 +7,11 @@
 
 struct InGameScreen : Screen
 {
-    InGameScreen(Progress& progress, int levelNumber);
-    std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
+    InGameScreen(std::shared_ptr<SharedState> sharedState, int levelNumber);
+    ScreenFactory update(std::chrono::duration<float> dt) override;
     void render() override;
 
-    Progress& progress;
+    std::shared_ptr<SharedState> sharedState;
     int levelNumber;
     LevelData level;
     Updater updater;

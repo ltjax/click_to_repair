@@ -7,13 +7,13 @@
 
 struct WinScreen : Screen
 {
-    WinScreen(Progress& progress, int finished_level);
+    WinScreen(std::shared_ptr<SharedState> sharedState, int finished_level);
 
-    std::unique_ptr<Screen> update(std::chrono::duration<float> dt) override;
+    ScreenFactory update(std::chrono::duration<float> dt) override;
     void render() override;
 
 private:
-    Progress& progress_;
+    std::shared_ptr<SharedState> sharedState_;
     int finished_level_;
     OTextureRef checkmark_;
     OAnimFloat anim_;
