@@ -291,13 +291,15 @@ void updateEngineQuality(LevelData& state, std::chrono::duration<float> dt)
 void updateHamsterQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Hamster, Durability, Quality>();
+    auto view = registry.view<Hamster, Durability, QualityStatus>();
 
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
-        auto& quality = view.get<Quality>(entity);
-        quality = computeQuality(durability, 0.05, 0.15);
+        auto& quality = view.get<QualityStatus>(entity);
+
+        quality.previous = quality.current;
+        quality.current = computeQuality(durability, 0.05, 0.15);
     }
 }
 
