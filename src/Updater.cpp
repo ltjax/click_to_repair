@@ -131,7 +131,7 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
     // normal condition
     state.repairium += 0.05f * dt.count();
 
-    if (state.repairium >= 0.1f)
+    if (state.repairium >= 1.0f)
     {
         state.repairium = 1.f;
         state.won_level = true;
