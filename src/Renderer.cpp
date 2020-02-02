@@ -89,13 +89,15 @@ void renderQualityLights(GameState const& state)
 
 decltype(OGetTexture("")) icon_wrench;
 
-void renderCursor()
+void renderCursor(GameState const& state)
 {
     auto textureSize = icon_wrench->getSizef();
 
     const float targetSize = 96;
     oRenderer->renderStates.blendMode = OBlendAlpha;
-    float rotation = 0.f;
+    static float rot_time;
+    auto s = std::sinf(state.repair_time * 7.f);
+    float rotation = state.is_repairing ? (s < 0 ? 1.f : -1.f) * (s*s) * 25.f : 0.f;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
@@ -118,7 +120,7 @@ void Renderer::run()
     renderDurabilityBar(registry);
     renderRepairiumBar(state_);
     renderQualityLights(state_);
-    renderCursor(); // should be called last, so it is rendered on top
+    renderCursor(state_); // should be called last, so it is rendered on top
 
     oSpriteBatch->end();
 }
