@@ -52,7 +52,10 @@ void CreditsScreen::render()
         " Alexander Kasper",
         " Thomas Kranz",
         " Sven Moellers",
-        " Fabian Sperber"
+        " Fabian Sperber",
+        "",
+        "",
+        " Additional Music: Dr. Matze"
     };
 
     Vector2 position(10, 10);

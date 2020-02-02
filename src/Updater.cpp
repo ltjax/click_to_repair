@@ -340,8 +340,6 @@ void updateHamsterQuality(LevelData& state, std::chrono::duration<float> dt)
 
 void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
 {
-    static std::mt19937 Rng;
-
     if (state.is_repairing)
     {
         auto previous = state.repair_time;
@@ -351,7 +349,7 @@ void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
         if (std::ceil(previous / sound_period) != std::ceil(state.repair_time / sound_period))
         {
             std::uniform_int_distribution<int> SoundIndex(1, 7);
-            OPlaySound("wrench_" + std::to_string(SoundIndex(Rng)) + ".wav", 1.f, 0.f, 1.f);
+            OPlaySound("wrench_" + std::to_string(SoundIndex(state.rng)) + ".wav", 1.f, 0.f, 1.f);
         }
 
         return; // No new repairium if we repair
