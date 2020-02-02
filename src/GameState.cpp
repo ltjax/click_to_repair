@@ -13,9 +13,7 @@ void Progress::load()
     *this = {}; // reset to defaults just in case
 
 #if defined(WIN32)
-  if (onut::fileExists(save_file))
-  {
-    try
+    if (onut::fileExists(save_file))
     {
         try
         {
@@ -29,7 +27,7 @@ void Progress::load()
         }
     }
 #else
-  next_available_level = 99; // congratulations!
+    next_available_level = 99; // congratulations!
 #endif
 }
 
