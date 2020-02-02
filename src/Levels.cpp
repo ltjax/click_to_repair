@@ -32,6 +32,7 @@ entt::entity createHamster(entt::registry& registry, Vector2 position, float dur
 {
     auto hamster = createPart(registry, position, durability, "hamster.wav");
     registry.assign<Hamster>(hamster);
+    registry.assign<Hiccup>(hamster, "hiccup.wav");
     return hamster;
 }
 
