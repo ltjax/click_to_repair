@@ -28,7 +28,7 @@ GameState gameState;
 void initSettings()
 {
     oSettings->setGameName("Click to repair!");
-    oSettings->setResolution({1280, 1024});
+    oSettings->setResolution({1024, 768});
 }
 
 void init()
