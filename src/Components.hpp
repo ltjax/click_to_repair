@@ -35,6 +35,10 @@ struct Engine
     float shake = 1.f;
 };
 
+struct FluxCapacitor
+{
+};
+
 struct HoverState
 {
     bool containsMouse = false;
