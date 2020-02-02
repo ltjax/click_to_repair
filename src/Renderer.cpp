@@ -215,14 +215,13 @@ void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
         if (auto hover = registry.try_get<HoverState const>(entity); hover && hover->containsMouse)
           rotation = 3.f * std::sin(5.f * hover->timeIn.count()) + 2.f;
 
-        Color color = Color::White; 
-
         if (machine.warningDuration > std::chrono::duration<float>::zero()) 
         {
-            color = colorForQuality(quality.current);
+            float scale = 1.08;
+            oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), Color::White, rotation, scale);
 
         }
-        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), color , rotation);
+        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), Color::White , rotation);
 
     }
 }

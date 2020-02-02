@@ -314,7 +314,7 @@ void updateQualityWarning(LevelData& state, std::chrono::duration<float> dt)
 
         if (quality.current < quality.previous)
         {
-            machine.warningDuration = std::chrono::milliseconds(100);
+            machine.warningDuration = std::chrono::milliseconds(400);
         }
         else
         {
