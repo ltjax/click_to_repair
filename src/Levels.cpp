@@ -46,13 +46,13 @@ entt::entity createGlobalQualitySound(entt::registry& registry)
 
 void level0(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, Vector2{0.f}, 0.4f);
+    createGear(registry, Vector2{0.f}, 0.2f);
 }
 
 void level1(entt::registry& registry, LevelData& state)
 {
     createGear(registry, Vector2(-150, 0), 0.65f);
-    createGear(registry, Vector2(150, 0), 0.65f);
+    createGear(registry, Vector2(150, 0), 0.75f);
 }
 
 void level2(entt::registry& registry, LevelData& state)
@@ -76,7 +76,7 @@ void level4(entt::registry& registry, LevelData& state)
     createGear(registry, Vector2(-x, y), 0.75f);
     createGear(registry, Vector2(x, -y), 0.75f);
     createHamster(registry, Vector2(x, y), 1.0f);
-    state.reparium_multiplier = 1.6f;
+    state.reparium_multiplier = 1.5f;
 }
 
 using LevelFunc = void (*)(entt::registry&, LevelData&);
