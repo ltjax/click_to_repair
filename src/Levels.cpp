@@ -3,41 +3,38 @@
 #include "Constants.hpp"
 #include <onut/Renderer.h>
 
+entt::entity createPart(entt::registry& registry, Vector2 position, float durability, std::string const& hoverSound)
+{
+    auto part = registry.create();
+    registry.assign<Machine>(part, position, 128.f);
+    registry.assign<QualityStatus>(part);
+    registry.assign<Durability>(part, durability);
+    registry.assign<HoverSound>(part, OCreateSoundInstance(hoverSound));
+    registry.assign<HoverState>(part);
+    return part;
+}
+
 entt::entity createGear(entt::registry& registry, Vector2 position, float durability)
 {
-    auto gear = registry.create();
-    registry.assign<Machine>(gear, position, 128.f);
-    registry.assign<QualityStatus>(gear);
+    auto gear = createPart(registry, position, durability, "cogs.wav");
     registry.assign<Gear>(gear);
-    registry.assign<Durability>(gear, durability);
-    registry.assign<HoverSound>(gear, OCreateSoundInstance("cogs.wav"));
-    registry.assign<HoverState>(gear);
     return gear;
 }
 
 entt::entity createEngine(entt::registry& registry, Vector2 position, float durability)
 {
-    auto engine = registry.create();
-    registry.assign<Machine>(engine, position, 128.f);
-    registry.assign<QualityStatus>(engine);
+    auto engine = createPart(registry, position, durability, "ambient_machine1.wav");
     registry.assign<Engine>(engine);
-    registry.assign<Durability>(engine, durability);
-    registry.assign<HoverState>(engine);
-    registry.assign<HoverSound>(engine, OCreateSoundInstance("ambient_machine1.wav"));
     return engine;
 }
 
 entt::entity createHamster(entt::registry& registry, Vector2 position, float durability)
 {
-    auto hamster = registry.create();
-    registry.assign<Machine>(hamster, position, 128.f);
+    auto hamster = createPart(registry, position, durability, "hamster.wav");
     registry.assign<Hamster>(hamster);
-    registry.assign<Durability>(hamster, durability);
-    registry.assign<HoverState>(hamster);
-    registry.assign<QualityStatus>(hamster);
-    registry.assign<HoverSound>(hamster, OCreateSoundInstance("hamster.wav"));
     return hamster;
 }
+
 entt::entity createGlobalQualitySound(entt::registry& registry)
 {
     auto entity = registry.create();
