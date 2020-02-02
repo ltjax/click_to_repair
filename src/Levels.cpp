@@ -24,6 +24,7 @@ entt::entity createGear(entt::registry& registry, Vector2 position, float durabi
 entt::entity createFluxCapacitor(entt::registry& registry, Vector2 position, float durability) {
     auto flux = createPart(registry, position, durability, "flux_capacitor.wav");
     registry.assign<FluxCapacitor>(flux);
+    registry.assign<Overload>(flux);
     return flux;
 }
 
@@ -45,7 +46,7 @@ entt::entity createHamster(entt::registry& registry, Vector2 position, float dur
 
 void level0(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, Vector2{0.f}, 0.2f);
+    createEngine(registry, Vector2{0.f}, 0.2f);
 }
 
 void level1(entt::registry& registry, LevelData& state)
@@ -78,6 +79,13 @@ void level4(entt::registry& registry, LevelData& state)
     state.reparium_multiplier = 1.25f;
 }
 
+void level5(entt::registry& registry, LevelData& state)
+{
+    createEngine(registry, Vector2(-300.f, 0.f), 1.f);
+    createFluxCapacitor(registry, Vector2(0.f, 0.f), 0.5f);
+    createHamster(registry, Vector2(300.f, 0.f), 0.75f);
+}
+
 using LevelFunc = void (*)(entt::registry&, LevelData&);
 LevelFunc levels[] = {
     level0,
@@ -85,6 +93,7 @@ LevelFunc levels[] = {
     level2,
     level3,
     level4,
+    level5,
 };
 constexpr auto MAX_LEVEL = std::size(levels);
 namespace Constants

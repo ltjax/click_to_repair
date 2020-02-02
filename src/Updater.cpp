@@ -62,7 +62,7 @@ void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
         auto& hiccup = view.get<Hiccup>(entity);
         if (hamster.nextHiccup <= std::chrono::duration<float>{0})
         {
-            hamster.decay += hiccupDurabilityLoss(state.rng);
+            hamster.decay += hiccupDurabilityLoss(state.rng) * state.wear_multiplier;
             hamster.nextHiccup = std::chrono::duration<float>(hiccupPause(state.rng));
             hiccup.sound_played = false;
             hiccup.jump_height = 1.f;
@@ -132,7 +132,7 @@ void updateGearWear(LevelData& state, std::chrono::duration<float> dt)
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
-        durability = std::max(0.f, durability - dt.count() * Constants::GEAR_WEAR_PER_SECOND);
+        durability = std::max(0.f, durability - dt.count() * Constants::GEAR_WEAR_PER_SECOND * state.wear_multiplier);
     }
 }
 
@@ -147,7 +147,7 @@ void updateEngineWear(LevelData& state, std::chrono::duration<float> delta)
         auto wear = view.get<Engine>(entity).shake > 0.f ?
             Constants::ENGINE_WEAR_PER_SECOND_SHAKING :
             Constants::ENGINE_WEAR_PER_SECOND;
-        durability = std::max(0.f, durability - delta.count() * wear);
+        durability = std::max(0.f, durability - delta.count() * wear * state.wear_multiplier);
     }
 }
 
@@ -169,6 +169,17 @@ void updateHamsterWear(LevelData& state, std::chrono::duration<float> delta)
     }
 }
 
+void updateFluxCapacitorWear(LevelData& state, std::chrono::duration<float> delta)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Durability, FluxCapacitor>();
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        durability = std::max(0.f, durability - Constants::FLUX_CAPACITOR_WEAR_PER_SECOND * delta.count());
+    }    
+}
+
 void updateWear(LevelData& state, std::chrono::duration<float> dt)
 {
     // Hamsters always wear down!
@@ -181,6 +192,7 @@ void updateWear(LevelData& state, std::chrono::duration<float> dt)
     }
     updateGearWear(state, dt);
     updateEngineWear(state, dt);
+    updateFluxCapacitorWear(state, dt);
 }
 
 void updateHoverStates(entt::registry& registry, std::chrono::duration<float> dt, Matrix const& camera)
@@ -357,6 +369,55 @@ void updateHamsterQuality(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
+void updateFluxCapacitorQuality(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<FluxCapacitor, Durability, QualityStatus>();
+
+    for (auto entity : view)
+    {
+        auto& durability = view.get<Durability>(entity).durability;
+        auto& quality = view.get<QualityStatus>(entity);
+
+        quality.previous = quality.current;
+        quality.current = computeQuality(durability, 0.33f, 0.66f);
+    }
+}
+
+void updateOverload(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Overload, QualityStatus>();
+
+    for (auto entity : view)
+    {
+        auto& overloaded = view.get<Overload>(entity).Overloaded;
+        auto& quality = view.get<QualityStatus>(entity);
+
+        auto delta = dt / Constants::FLUX_CAPACITOR_OVERLOAD_TIME;
+        if (quality.current == Quality::Good)
+        {
+            overloaded = std::clamp(overloaded - delta, 0.f, 1.f);
+        }
+        else
+        {
+            overloaded = std::clamp(overloaded + delta, 0.f, 1.f);
+        }
+    }
+
+    bool HasOverloaded = false;
+    for (auto entity : registry.view<Overload>())
+    {
+        if (view.get<Overload>(entity).Overloaded == 1.f)
+        {
+            HasOverloaded = true;
+            break;
+        }
+    }
+
+    state.wear_multiplier = HasOverloaded ? 3.f : 1.f;
+}
+
 
 void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
 {
@@ -461,7 +522,9 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGearQuality(level, dt);
     updateEngineQuality(level, dt);
     updateHamsterQuality(level, dt);
+    updateFluxCapacitorQuality(level, dt);
     updateGlobalQuality(level, dt);
+    updateOverload(level, dt);
     updateGlobalQualitySound(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
