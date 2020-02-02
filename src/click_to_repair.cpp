@@ -34,7 +34,7 @@ void init()
 {
     oContentManager->addSearchPath("../../../../assets");
     gameState.shared_state = std::make_shared<SharedState>();
-    gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.shared_state); // TODO: restore progress from save file?
+    gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.shared_state);
     gameState.shared_state->progress.load();
 }
 

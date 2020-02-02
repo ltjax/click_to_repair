@@ -6,6 +6,7 @@
 #include "Constants.hpp"
 #include "MainMenuScreen.hpp"
 #include "InGameScreen.hpp"
+#include "CreditsScreen.hpp"
 
 WinScreen::WinScreen(std::shared_ptr<SharedState> sharedState, int finished_level)
   : sharedState_(sharedState), finished_level_(finished_level)
@@ -36,6 +37,8 @@ Screen::Factory WinScreen::update(std::chrono::duration<float> dt)
 
     if (OInputJustPressed(OMouse1))
     {
+        if (next_level == Constants::MAX_LEVELS())
+            return [state = sharedState_] {return std::make_unique<CreditsScreen>(state); };
         return [state = sharedState_, next_level] {return std::make_unique<InGameScreen>(state, next_level);};
     }
 
