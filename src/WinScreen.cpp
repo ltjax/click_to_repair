@@ -11,9 +11,6 @@
 WinScreen::WinScreen(std::shared_ptr<SharedState> sharedState, int finished_level)
   : sharedState_(sharedState), finished_level_(finished_level)
 {
-    auto& progress_ = sharedState->progress;
-    progress_.next_available_level = std::max(progress_.next_available_level, finished_level_ + 1);
-    progress_.save();
     checkmark_ = OGetTexture("level_complete.png");
     sound_ = OCreateSoundInstance("level_complete.wav");
     sound_->play();
