@@ -161,12 +161,16 @@ void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Colo
 void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
 {
     auto frame = OGetTexture("frame.png");
+    auto frame_size = frame->getSizef();
     auto view = registry.view<Machine const>();
 
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
-        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera));
+        auto pos = Vector2::Transform(machine.position, camera);
+        auto r = Rect(pos - frame_size / 2.f, frame_size);
+        auto rotation = r.Contains(oInput->mousePosf) ? 5.f : 0.f;
+        oSpriteBatch->drawSprite(frame, pos, Color::White, rotation);
     }
 }
 
