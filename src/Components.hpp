@@ -13,6 +13,7 @@ struct Machine
 {
     Vector2 position;
     float size = 128.f;
+    std::chrono::duration<float> warningDuration = std::chrono::duration<float>::zero();
 
     Rect getBoundingBox(Matrix const& camera) const
     {
@@ -77,3 +78,5 @@ struct Hiccup
     bool sound_played = false;
     float jump_height = 0.f;
 };
+
+
