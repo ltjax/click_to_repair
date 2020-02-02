@@ -60,3 +60,8 @@ struct Hamster
     std::chrono::duration<float> nextHiccup;
     float decay = 0.f;
 };
+
+struct Hiccup
+{
+    std::string sfxFilename;
+};

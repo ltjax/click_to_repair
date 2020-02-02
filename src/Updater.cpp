@@ -54,11 +54,23 @@ void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
         {
             hamster.decay += hiccupDurabilityLoss(state.rng);
             hamster.nextHiccup = std::chrono::duration<float>(hiccupPause(state.rng));
+            registry.assign<Hiccup>(entity, "hiccup.wav");
         }
         else
         {
             hamster.nextHiccup -= dt;
         }
+    }
+}
+
+void updateHiccupEffects(entt::registry& registry)
+{
+    auto view = registry.view<Hiccup>();
+    for (auto entity : view)
+    {
+        auto& hiccup = view.get<Hiccup>(entity);
+        OPlaySound(hiccup.sfxFilename);
+        registry.remove<Hiccup>(entity);
     }
 }
 
@@ -361,6 +373,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateEngines(registry, dt);
     updateHamsters(registry, dt);
     updateHamsterHiccups(level, dt);
+    updateHiccupEffects(registry);
     updateRepair(level, dt);
     updateWear(level, dt);
     updateGearQuality(level, dt);
