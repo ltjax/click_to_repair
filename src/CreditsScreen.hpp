@@ -14,4 +14,5 @@ private:
     std::shared_ptr<SharedState> sharedState_;
     OTextureRef checkmark_;
     OAnimFloat anim_;
+    OAnimFloat zoom_;
 };

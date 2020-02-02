@@ -16,6 +16,14 @@ CreditsScreen::CreditsScreen(std::shared_ptr<SharedState> sharedState)
         OTweenEaseBoth, // Tween
         OPingPongLoop // Loop
     );
+
+    zoom_.play(
+        2.f, // From
+        1, // To
+        2.f, // Duration in Seconds
+        OTweenBounceOut, // Tween
+        ODontLoop // Loop
+    );
     checkmark_ = OGetTexture("level_complete.png");
 }
 
@@ -35,7 +43,7 @@ void CreditsScreen::render()
     oRenderer->clear(Constants::BackgroundColor());
 
     oSpriteBatch->begin();
-    oSpriteBatch->drawSprite(checkmark_, OScreenCenterf, Color::White, anim_.get(), 0.33f);
+    oSpriteBatch->drawSprite(checkmark_, OScreenCenterf, Color::White, anim_.get(), 0.33f * zoom_.get());
     oSpriteBatch->end();
 
     std::string Lines[]{
