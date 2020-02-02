@@ -51,6 +51,12 @@ struct HoverSound
     OSoundInstanceRef background;
 };
 
+struct Overload
+{
+    // < 1.f means no effect, 1.f means effect
+    float Overloaded = 0.f;
+};
+
 enum class Quality
 {
     Worst,

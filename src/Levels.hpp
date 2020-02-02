@@ -20,6 +20,7 @@ struct LevelData
     std::mt19937 rng;
     float reparium_multiplier = 1.f;
     float animation_factor = 1.f;
+    float wear_multiplier = 1.f;
 };
 
 LevelData create_level(int index);
