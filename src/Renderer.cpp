@@ -298,6 +298,24 @@ void renderQualityLights(LevelData const& state)
     }
 }
 
+void renderCriticalMachines(entt::registry const& registry, Matrix const& camera, float animOffset)
+{
+    auto frame = OGetTexture("frame.png");
+    auto frame_size = frame->getSizef();
+    auto arrow = OGetTexture("critical_arrow.png");
+    auto arrow_size = arrow->getSizef();
+    auto view = registry.view<Machine const, QualityStatus const>();
+
+    for (auto entity : view)
+    {
+        if (view.get<QualityStatus const>(entity).current != Quality::Worst)
+            continue;
+
+        auto const& machine = view.get<Machine const>(entity);
+        oSpriteBatch->drawSprite(arrow, Vector2::Transform(machine.position, camera) - Vector2(0, frame_size.y / 2.f + (animOffset - 0.5f) * arrow_size.y / 3.f), Color::White, 0.f, 0.5f);
+    }
+}
+
 void renderCursor(LevelData const& state)
 {
     oInput->setMouseVisible(!state.is_repairing);
@@ -318,6 +336,17 @@ void renderCursor(LevelData const& state)
         Vector2(0.1f, 0.1f));
 }
 
+
+Renderer::Renderer(LevelData const& level_) : level(level_)
+{
+    anim_critical_machines_.play(
+        0.f, // From
+        1.f, // To
+        0.5f, // Duration in Seconds
+        OTweenEaseBoth,
+        OPingPongLoop
+    );
+}
 
 void Renderer::run()
 {
@@ -341,6 +370,7 @@ void Renderer::run()
     renderDurabilityBar(registry, level.camera);
     renderRepairiumBar(level);
     renderQualityLights(level);
+    renderCriticalMachines(registry, level.camera, anim_critical_machines_);
     oRenderer->renderStates.blendMode = OBlendAlpha;
     renderCursor(level); // should be called last, so it is rendered on top
 
