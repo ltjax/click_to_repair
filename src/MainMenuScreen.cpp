@@ -39,6 +39,20 @@ MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
     OTweenEaseBoth,
     OPingPongLoop
   );
+  anim_mouse_.play(
+    -0.7f, // From
+    0.3f, // To
+    0.5f, // Duration in Seconds
+    OTweenLinear,
+    OPingPongLoop
+  );
+  anim_arrow_.play(
+    -0.5f, // From
+    0.5f, // To
+    2.f, // Duration in Seconds
+    OTweenEaseOut,
+    OPingPongLoop
+  );
   anim_main_logo_.play(
     0.f, // From
     20.f, // To
@@ -77,10 +91,31 @@ void MainMenuScreen::render()
   oRenderer->clear(Constants::BackgroundColor());
   oSpriteBatch->begin();
   {
+    auto icon_wrench = OGetTexture("mouse.png");
+    auto textureSize = icon_wrench->getSizef();
+    const float targetSize = 0.7f * OScreenHf * 2.f / 3.f;
+    auto pos = Vector2(OScreenCenterXf * 0.5f, OScreenHf / 3.f + 32.f);
+    oSpriteBatch->drawSprite(icon_wrench, pos,
+      Color::White, 0.f,  targetSize / textureSize.x, onut::Align::Center);
+    if (anim_mouse_ > 0.f)
+    {
+      auto icon_press = OGetTexture("white_dot.png");
+      oSpriteBatch->drawSprite(icon_press, pos + Vector2(-targetSize / 10.f, -targetSize / 15.f),
+        Color::White, 0.f, 2.f, onut::Align::Center);
+    }
+  }
+  {
+    auto icon_wrench = OGetTexture("back.png");
+    auto textureSize = icon_wrench->getSizef();
+    const float targetSize = 0.3f * OScreenHf * 2.f / 3.f;
+    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf + anim_arrow_ * 0.05f * OScreenWf, OScreenHf *5.f / 12.f ),
+      Color::White, 180.f, targetSize / textureSize.x, onut::Align::Center);
+  }
+  {
     auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
-    const float targetSize = OScreenHf * 2.f / 3.f;
-    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf, OScreenHf / 3.f + 32.f),
+    const float targetSize = 0.7f * OScreenHf * 2.f / 3.f;
+    oSpriteBatch->drawSprite(icon_wrench, Vector2(OScreenCenterXf * 1.5f, OScreenHf / 3.f + 32.f),
       Color::White, anim_main_logo_ - 15.f, targetSize / textureSize.x, onut::Align::Center);
   }
 
