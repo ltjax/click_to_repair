@@ -167,10 +167,10 @@ void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
-        auto pos = Vector2::Transform(machine.position, camera);
-        auto r = Rect(pos - frame_size / 2.f, frame_size);
-        auto rotation = r.Contains(oInput->mousePosf) ? 5.f : 0.f;
-        oSpriteBatch->drawSprite(frame, pos, Color::White, rotation);
+        auto rotation = 0.f;
+        if (auto hover = registry.try_get<HoverState const>(entity); hover && hover->containsMouse)
+          rotation = 3.f * std::sin(5.f * hover->timeIn.count()) + 2.f;
+        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), Color::White, rotation);
     }
 }
 
