@@ -202,15 +202,15 @@ void updateHoverSounds(entt::registry& registry)
             }
             else
             {
-                auto newVolume = std::clamp(hoverState.timeIn.count(), 0.f, 1.f);
+                auto newVolume = std::clamp(hoverState.timeIn.count(), 0.f, 0.7f);
                 hoverSound.background->setVolume(newVolume);
             }
         }
         if (!hoverState.containsMouse && hoverSound.background->isPlaying())
         {
-            auto newVolume = 1.f - std::clamp(hoverState.timeOut.count(), 0.f, 1.f);
+            auto newVolume = 0.7f - std::clamp(hoverState.timeOut.count(), 0.f, 0.7f);
             hoverSound.background->setVolume(newVolume);
-            if (hoverState.timeOut.count() > 1.f)
+            if (hoverState.timeOut.count() > 0.7f)
             {
                 hoverSound.background->stop();
             }
