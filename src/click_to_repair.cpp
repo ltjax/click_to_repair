@@ -22,17 +22,6 @@
 
 // Global game state
 GameState gameState;
-Updater updater(gameState);
-Renderer renderer(gameState);
-
-entt::entity createGear(entt::registry& registry, Vector2 position)
-{
-    auto gear = registry.create();
-    registry.assign<Machine>(gear, position, 128.f);
-    registry.assign<Gear>(gear);
-    registry.assign<Durability>(gear, 1.f);
-    return gear;
-}
 
 void initSettings()
 {
@@ -41,23 +30,18 @@ void initSettings()
 
 void init()
 {
-    auto& registry = gameState.entities;
-
     oContentManager->addSearchPath("../../../../assets");
-    renderer.init();
-
-    createGear(registry, OScreenCenterf);
 }
 
 void update()
 {
     auto dt = std::chrono::duration<float>{ ODT };
-    updater.run(dt);
+    gameState.menu_state->update(dt);
 }
 
 void render()
 {
-    renderer.run();
+    gameState.menu_state->render();
 }
 
 void postRender()

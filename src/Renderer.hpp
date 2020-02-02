@@ -1,15 +1,14 @@
 #pragma once
-#include "GameState.hpp"
+#include "Levels.hpp"
 #include <chrono>
 #include <onut/SpriteBatch.h>
 
 class Renderer
 {
 public:
-    Renderer(GameState const& state) : state_(state) {}
+    Renderer(LevelData const& level_) : level(level_) {}
 
-    void init();
     void run();
 private:
-    GameState const& state_;
+    LevelData const& level;
 };

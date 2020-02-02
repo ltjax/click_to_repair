@@ -75,7 +75,7 @@ void renderDurabilityBar(entt::registry const& registry)
     }
 }
 
-void renderRepairiumBar(GameState const& state)
+void renderRepairiumBar(LevelData const& state)
 {
     auto barHeight = 30.f;
     auto screenSize = OScreenf;
@@ -84,7 +84,7 @@ void renderRepairiumBar(GameState const& state)
     renderBar(oSpriteBatch, rect, state.repairium, Color::White);
 }
 
-void renderQualityLights(GameState const& state)
+void renderQualityLights(LevelData const& state)
 {
     auto screenSize = OScreenf;
     auto texture = OGetTexture("white_dot.png");
@@ -112,15 +112,14 @@ void renderQualityLights(GameState const& state)
     }
 }
 
-decltype(OGetTexture("")) icon_wrench;
-
-void renderCursor(GameState const& state)
+void renderCursor(LevelData const& state)
 {
     oInput->setMouseVisible(!state.is_repairing);
 
     if (!state.is_repairing)
         return;
 
+    auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
 
     const float targetSize = 96;
@@ -133,25 +132,21 @@ void renderCursor(GameState const& state)
         Vector2(0.1f, 0.1f));
 }
 
-void Renderer::init()
-{
-    icon_wrench = OGetTexture("wrench.png");
-}
 
 void Renderer::run()
 {
     oRenderer->clear(Constants::BackgroundColor());
     oSpriteBatch->begin();
 
-    auto& registry = state_.entities;
+    auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     renderMachineFrames(registry);
     renderGears(registry);
     renderDurabilityBar(registry);
-    renderRepairiumBar(state_);
-    renderQualityLights(state_);
+    renderRepairiumBar(level);
+    renderQualityLights(level);
     oRenderer->renderStates.blendMode = OBlendAlpha;
-    renderCursor(state_); // should be called last, so it is rendered on top
+    renderCursor(level); // should be called last, so it is rendered on top
 
     oSpriteBatch->end();
 }
