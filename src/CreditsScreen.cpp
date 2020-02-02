@@ -6,6 +6,7 @@
 #include <onut/Sound.h>
 #include "Constants.hpp"
 #include "MainMenuScreen.hpp"
+#include "utils.hpp"
 
 CreditsScreen::CreditsScreen(std::shared_ptr<SharedState> sharedState)
     : sharedState_(sharedState)
@@ -32,7 +33,7 @@ CreditsScreen::CreditsScreen(std::shared_ptr<SharedState> sharedState)
 
 Screen::Factory CreditsScreen::update(std::chrono::duration<float> dt)
 {
-    if (OInputJustPressed(OKeyEscape) || OInputJustPressed(OMouse1))
+    if (OInputJustPressed(OKeyEscape) || (OInputJustPressed(OMouse1) && !get_fullscreen_rect().Contains(oInput->mousePosf)))
     {
         return [state = sharedState_] {return std::make_unique<MainMenuScreen>(state); };
     }
@@ -61,7 +62,7 @@ void CreditsScreen::render()
         " Additional Music: Dr. Matze"
     };
 
-    Vector2 position(10, 70);
+    Vector2 position(10, get_fullscreen_rect().Bottom().y + 20);
 
     for (auto const& Each : Lines)
     {

@@ -25,14 +25,6 @@
 // Global game state
 GameState gameState;
 
-namespace {
-  Rect get_fullscreen_rect()
-  {
-    Vector2 size(96);
-    return {0, 0, size };
-  }
-}
-
 void initSettings()
 {
     oSettings->setGameName("Click to repair!");
