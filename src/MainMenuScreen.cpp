@@ -53,7 +53,7 @@ MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
   backgroundMusic->play();
 }
 
-Screen::ScreenFactory MainMenuScreen::update(std::chrono::duration<float> dt)
+Screen::Factory MainMenuScreen::update(std::chrono::duration<float> dt)
 {
   if (OInputJustPressed(OKeyEscape))
   {

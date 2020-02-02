@@ -26,7 +26,7 @@ WinScreen::WinScreen(std::shared_ptr<SharedState> sharedState, int finished_leve
     );
 }
 
-Screen::ScreenFactory WinScreen::update(std::chrono::duration<float> dt)
+Screen::Factory WinScreen::update(std::chrono::duration<float> dt)
 {
     const auto next_level = finished_level_ + 1;
     if (OInputJustPressed(OKeyEscape))

@@ -8,7 +8,7 @@
 struct MainMenuScreen : Screen
 {
   MainMenuScreen(std::shared_ptr<SharedState> sharedState);
-  ScreenFactory update(std::chrono::duration<float> dt) override;
+  Factory update(std::chrono::duration<float> dt) override;
 
   void render() override;
 

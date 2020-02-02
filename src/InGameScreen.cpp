@@ -10,7 +10,7 @@ InGameScreen::InGameScreen(std::shared_ptr<SharedState> sharedState_, int levelN
     backgroundMusic->play();
 }
 
-Screen::ScreenFactory InGameScreen::update(std::chrono::duration<float> dt)
+Screen::Factory InGameScreen::update(std::chrono::duration<float> dt)
 {
     auto finished = updater.run(dt);
 

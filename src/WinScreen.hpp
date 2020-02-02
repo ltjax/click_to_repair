@@ -9,7 +9,7 @@ struct WinScreen : Screen
 {
     WinScreen(std::shared_ptr<SharedState> sharedState, int finished_level);
 
-    ScreenFactory update(std::chrono::duration<float> dt) override;
+    Factory update(std::chrono::duration<float> dt) override;
     void render() override;
 
 private:

@@ -21,6 +21,8 @@ add_executable(${TARGET_NAME} WIN32
   WinScreen.hpp
   MainMenuScreen.cpp
   MainMenuScreen.hpp
+  CreditsScreen.cpp
+  CreditsScreen.hpp
 )
 
 target_link_libraries(${TARGET_NAME} 
