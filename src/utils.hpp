@@ -22,3 +22,9 @@ inline Color get_color_focus(Rect const& rect)
 {
   return rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
 }
+
+inline Rect get_fullscreen_rect()
+{
+  Vector2 size(96);
+  return { 0, 0, size };
+}
