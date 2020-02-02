@@ -10,7 +10,7 @@ entt::entity createGear(entt::registry& registry, Vector2 position, float durabi
     registry.assign<QualityStatus>(gear);
     registry.assign<Gear>(gear);
     registry.assign<Durability>(gear, durability);
-    registry.assign<HoverSound>(gear, OCreateSoundInstance("aircompressor.wav"));
+    registry.assign<HoverSound>(gear, OCreateSoundInstance("cogs.wav"));
     registry.assign<HoverState>(gear);
     return gear;
 }
@@ -23,6 +23,7 @@ entt::entity createEngine(entt::registry& registry, Vector2 position, float dura
     registry.assign<Engine>(engine);
     registry.assign<Durability>(engine, durability);
     registry.assign<HoverState>(engine);
+    registry.assign<HoverSound>(engine, OCreateSoundInstance("ambient_machine1.wav"));
     return engine;
 }
 

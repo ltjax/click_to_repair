@@ -49,7 +49,7 @@ MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
     OTweenEaseBoth,
     OPingPongLoop
   );
-  backgroundMusic = OGetMusic("background_music.ogg");
+  backgroundMusic = OGetMusic("menu_music.ogg");
   backgroundMusic->play();
 }
 

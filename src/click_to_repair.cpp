@@ -32,6 +32,7 @@ void initSettings()
 
 void init()
 {
+    std::srand(std::time(nullptr));
     oContentManager->addSearchPath("../../../../assets");
     gameState.shared_state = std::make_shared<SharedState>();
     gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.shared_state);
