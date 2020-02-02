@@ -265,7 +265,7 @@ void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
     entt::registry& registry = state.entities;
     auto view = registry.view<GlobalQualitySound>();
 
-    for (auto entity :view)
+    for (auto entity : view)
     {
         auto sound = view.get<GlobalQualitySound>(entity);
 
@@ -370,12 +370,12 @@ void updateQualityTransitions(LevelData& state, std::chrono::duration<float> dt)
         auto& quality = view.get<QualityStatus>(entity);
 
 
-        if (quality.current > quality.previous) 
+        if (quality.current > quality.previous)
         {
 
-        } 
+        }
 
-        if (quality.current < quality.previous) 
+        if (quality.current < quality.previous)
         {
 
         }
@@ -384,6 +384,8 @@ void updateQualityTransitions(LevelData& state, std::chrono::duration<float> dt)
 
 void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 {
+    state.last_repairium = state.repairium;
+
     if (state.is_repairing)
     {
         if (state.started_repairing)
@@ -402,6 +404,22 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 
     auto reparium_per_second = ((state.quality.current == Quality::Good) ? 0.1f : 0.05f) * state.reparium_multiplier;
     state.repairium += reparium_per_second * dt.count();
+}
+
+void playRepairiumSounds(LevelData& state)
+{
+    auto N = 8;
+    auto s = 1.f / (N + 1);
+
+    auto j = std::floor(state.repairium / s);
+    if (std::floor(state.last_repairium / s) < j)
+    {
+        auto soundIndex = static_cast<int>(j);
+        if (soundIndex <= 0 || soundIndex > N)
+            return;
+
+        OPlaySound("bell.wav", 0.5f, 0.f, 1.f + j * 0.05f);
+    }
 }
 
 
@@ -426,6 +444,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGlobalQualitySound(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
+    playRepairiumSounds(level);
 
     if (level.repairium >= 1.0f)
     {

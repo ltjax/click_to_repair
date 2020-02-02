@@ -9,6 +9,7 @@
 struct LevelData
 {
     entt::registry entities;
+    float last_repairium = 0.f;
     float repairium = 0.f;
     QualityStatus quality;
     bool is_repairing = false;
