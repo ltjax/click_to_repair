@@ -18,6 +18,7 @@ struct LevelData
     Matrix camera;
     std::mt19937 rng;
     float reparium_multiplier = 1.f;
+    float animation_factor = 1.f;
 };
 
 LevelData create_level(int index);

@@ -67,7 +67,7 @@ struct QualityStatus
     Quality current;
 };
 
-struct Hamster 
+struct Hamster
 {
     float delta = 0.f;
     std::chrono::duration<float> nextHiccup;
@@ -76,5 +76,7 @@ struct Hamster
 
 struct Hiccup
 {
-    std::string sfxFilename;
+    std::string sound_file;
+    bool sound_played = false;
+    float jump_height = 0.f;
 };
