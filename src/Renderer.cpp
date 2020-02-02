@@ -17,10 +17,10 @@ void renderMesh(OModel::Mesh* mesh, Matrix const& transform)
 
 void renderHamsters(LevelData const& level, Matrix centerScreen)
 {
-  auto model = OGetModel("hamster.obj");
-  auto view = level.entities.view<Machine const, Hamster const, Hiccup const>();
-  for (auto entity : view)
-  {
+    auto model = OGetModel("hamster.obj");
+    auto view = level.entities.view<Machine const, Hamster const, Hiccup const>();
+    for (auto entity : view)
+    {
         auto const& machine = view.get<Machine const>(entity);
         auto const& hamster = view.get<Hamster const>(entity);
         auto const& hiccup = view.get<Hiccup const>(entity);
@@ -66,11 +66,11 @@ void renderHamsters(LevelData const& level, Matrix centerScreen)
         renderMesh(model->getMesh(4), wheel_transform);
 
         auto stand_transform =
-          Matrix::CreateScale(scaleVec) *
-          Matrix::CreateTranslation(machine.position) *
-          centerScreen;
+            Matrix::CreateScale(scaleVec) *
+            Matrix::CreateTranslation(machine.position) *
+            centerScreen;
         renderMesh(model->getMesh(3), stand_transform);
-  }
+    }
 }
 
 void renderEngines(LevelData const& level, Matrix centerScreen)
@@ -88,33 +88,40 @@ void renderEngines(LevelData const& level, Matrix centerScreen)
     auto shakeFactor = engine.shake * 0.3 * level.animation_factor;
     auto shakeX = std::sin(rand()) * shakeFactor;
     auto shakeY = std::cos(rand()) * shakeFactor;
-    auto shakeTranslation = Matrix::CreateTranslation(shakeX, shakeY, 0.f);
+    auto common_transform =
+        Matrix::CreateTranslation(0.f, -3.f, 0.f) *
+        Matrix::CreateRotationZ(OConvertToRadians(180.f)) *
+        Matrix::CreateTranslation(shakeX, shakeY, 0.f);
     auto cam_shaft_transform =
-        shakeTranslation * 
+        common_transform * 
         Matrix::CreateScale(scale) *
-        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale }) *
+        Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(0), cam_shaft_transform);
   
     auto angle = engine.camShaftAngle * 8.f;
-    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle) - 2.f } * 0.5f;
-    auto piston_offset = Vector2{ 0.f, 3.2f + rod_offset.y };
+    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle)} * 0.5f;
+    auto piston_offset = Vector2{ 0.f, rod_offset.y };
 
     auto rod_transform = 
-        shakeTranslation *
+        Matrix::CreateRotationZ(OConvertToRadians(-rod_offset.x * 17.f)) *
+        common_transform *
         Matrix::CreateTranslation(rod_offset) * 
         Matrix::CreateScale(scale) * 
         Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(1), rod_transform);// rod
 
-    auto head_transform = Matrix::CreateScale(scale) *
-        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale + 25.f }) *
+    auto head_transform =
+        common_transform *
+        Matrix::CreateTranslation(0.f, 1.2f, 0.f) *
+        Matrix::CreateScale(scale) *
+        Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(2), head_transform);
 
     auto piston_transform =
-        shakeTranslation *
+        common_transform *
         Matrix::CreateTranslation(piston_offset) * 
         Matrix::CreateScale(scale) * 
         Matrix::CreateTranslation(machine.position) *

@@ -44,7 +44,7 @@ entt::entity createHamster(entt::registry& registry, Vector2 position, float dur
 
 void level0(entt::registry& registry, LevelData& state)
 {
-    createGear(registry, Vector2{0.f}, 0.2f);
+    createEngine(registry, Vector2{0.f}, 0.2f);
 }
 
 void level1(entt::registry& registry, LevelData& state)
