@@ -19,7 +19,8 @@ namespace
 InGameScreen::InGameScreen(std::shared_ptr<SharedState> sharedState_, int levelNumber_)
     : sharedState(sharedState_), levelNumber(levelNumber_), level(create_level(levelNumber)), updater(level), renderer(level)
 {
-    backgroundMusic = OGetMusic(sharedState_->music.getNext_music(sharedState_->rng));
+    auto file = sharedState_->music.getNext_music(sharedState_->rng);
+    backgroundMusic = OGetMusic(file);
     backgroundMusic->play();
 }
 
