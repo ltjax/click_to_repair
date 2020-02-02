@@ -41,7 +41,7 @@ Screen::Factory InGameScreen::update(std::chrono::duration<float> dt)
         auto next_level = levelNumber + 1;
         auto& progress_ = sharedState->progress;
         progress_.next_available_level = std::max(progress_.next_available_level, next_level);
-        progress_.save();
+        sharedState->save();
         if (next_level == Constants::MAX_LEVELS())
             return [state = sharedState] {return std::make_unique<CreditsScreen>(state); };
         return [sharedState = sharedState, levelNumber = levelNumber]() {return std::make_unique<WinScreen>(sharedState, levelNumber);};
