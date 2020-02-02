@@ -38,10 +38,18 @@ void init()
     gameState.shared_state = std::make_shared<SharedState>();
     gameState.menu_state = std::make_unique<MainMenuScreen>(gameState.shared_state);
     gameState.shared_state->load();
+    oSettings->setBorderlessFullscreen(gameState.shared_state->is_fullscreen);
 }
 
 void update()
 {
+    if ((OInputPressed(OKeyLeftAlt) || OInputPressed(OKeyRightAlt)) && OInputJustPressed(OKeyEnter))
+    {
+        gameState.shared_state->is_fullscreen = !gameState.shared_state->is_fullscreen;
+        oSettings->setBorderlessFullscreen(gameState.shared_state->is_fullscreen);
+        gameState.shared_state->save();
+    }
+
     auto dt = std::chrono::duration<float>{ ODT };
     auto next_state_factory = gameState.menu_state->update(dt);
     if (next_state_factory)

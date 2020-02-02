@@ -23,6 +23,7 @@ struct SharedState
     Progress progress;
     std::mt19937 rng;
     MusicPicker music;
+  bool is_fullscreen = false;
 
     void load();
     void save();
