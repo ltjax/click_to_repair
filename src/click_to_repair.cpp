@@ -44,6 +44,7 @@ void init()
     auto& registry = gameState.entities;
 
     oContentManager->addSearchPath("../../../../assets");
+    renderer.init();
 
     createGear(registry, OScreenCenterf);
 }

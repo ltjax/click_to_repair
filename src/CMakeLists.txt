@@ -2,10 +2,13 @@ set(TARGET_NAME click_to_repair)
 
 add_executable(${TARGET_NAME} WIN32
   click_to_repair.cpp
+  Components.hpp
+  GameState.hpp
   Updater.cpp
   Updater.hpp
   Renderer.cpp
   Renderer.hpp
+  utils.hpp
   Constants.cpp
   Constants.hpp
 )
