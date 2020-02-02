@@ -7,6 +7,7 @@
 #include <onut/Sound.h>
 #include <random>
 #include <onut/Renderer.h>
+#include <onut/Texture.h>
 
 void updateGears(LevelData& level, std::chrono::duration<float> dt)
 {
@@ -527,11 +528,32 @@ void playRepairiumSounds(LevelData& state)
 }
 
 
+void updateBackgroundGrid(LevelData& state, std::chrono::duration<float> delta)
+{
+    if (state.quality.current == Quality::Worst || state.is_repairing)
+    {
+        state.grid_speed = std::max(0.f, state.grid_speed - delta.count() / 1.5f);
+    }
+    else
+    {
+        state.grid_speed = std::min(1.f, state.grid_speed + delta.count() / 0.5f);
+    }
+
+    if (state.grid_speed == 0.f)
+        return;
+
+    state.grid_offset += delta.count() * Vector2(0.16f, 0.08f) * state.grid_speed;
+    state.grid_offset.x = std::fmod(state.grid_offset.x, 1.f);
+    state.grid_offset.y = std::fmod(state.grid_offset.y, 1.f);
+}
+
+
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
     level.camera = Matrix::CreateTranslation(OScreenf / 2.f);
 
     auto& registry = level.entities;
+    updateBackgroundGrid(level, dt);
     updateHoverStates(registry, dt, level.camera);
     updateHoverSounds(registry);
     updateGears(level, dt);

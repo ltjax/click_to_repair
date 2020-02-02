@@ -357,7 +357,7 @@ Renderer::Renderer(LevelData const& level_) : level(level_)
     );
 }
 
-void drawGrid()
+void drawGrid(Vector2 grid_offset)
 {
     auto grid = OGetTexture("grid.png");
     oSpriteBatch->begin();
@@ -367,12 +367,12 @@ void drawGrid()
     auto tx = static_cast<int>(std::ceil(s.x / g.x));
     auto ty = static_cast<int>(std::ceil(s.y / g.y));
     
-    oRenderer->renderStates.blendMode = OBlendAlpha;
-    for (int y = 0; y < ty; ++y)
-    for (int x = 0; x < tx; ++x)
+    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
+    for (int y = -1; y < ty; ++y)
+    for (int x = -1; x < tx; ++x)
     {
-        Rect rect(x*g.x, y*g.y, g.x, g.y);
-        oSpriteBatch->drawRect(grid, rect, Color(1.f, 1.f, 1.f, 0.7f));
+        Rect rect((grid_offset.x + x)*g.x, (grid_offset.y + y)*g.y, g.x, g.y);
+        oSpriteBatch->drawRect(grid, rect, Color(1.f, 1.f, 1.f, 0.85f));
     }
 
     oSpriteBatch->end();
@@ -381,7 +381,7 @@ void drawGrid()
 void Renderer::run()
 {
     oRenderer->clear(Constants::BackgroundColor());
-    drawGrid();
+    drawGrid(level.grid_offset);
     oRenderer->setupFor3D({ 0.f, 1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
     oRenderer->set2DCamera(Vector2::Zero);
     oRenderer->setAmbient(Color::White);
