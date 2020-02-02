@@ -21,6 +21,9 @@ struct LevelData
     float reparium_multiplier = 1.f;
     float animation_factor = 1.f;
     float wear_multiplier = 1.f;
+
+    Vector2 grid_offset{0.f};
+    float grid_speed = 1.f;
 };
 
 LevelData create_level(int index);

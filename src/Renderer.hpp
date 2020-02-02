@@ -4,6 +4,7 @@
 #include <onut/SpriteBatch.h>
 #include <onut/Anim.h>
 
+
 class Renderer
 {
 public:
