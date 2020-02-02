@@ -189,13 +189,39 @@ void renderDurabilityBar(entt::registry const& registry, Matrix const& camera)
     }
 }
 
+bool isHoveringAnyMachine(LevelData const& state)
+{
+  auto view = state.entities.view<Machine const, HoverState const>();
+  for (auto entity : view)
+  {
+    auto const& hoverState = view.get<HoverState const>(entity);
+    if (hoverState.containsMouse)
+      return true;
+  }
+  return false;
+}
+
 void renderRepairiumBar(LevelData const& state)
 {
     auto barHeight = 45.f;
     auto screenSize = OScreenf;
     auto rect = Rect{ 0.f, screenSize.y - barHeight, screenSize.x, barHeight };
     rect = shrinkRect(rect, Vector2{ 8.f });
-    renderBar(oSpriteBatch, rect, state.repairium, Color::White);
+    auto d = state.is_repairing || !isHoveringAnyMachine(state);
+    if (state.is_repairing)
+    {
+      renderBar(oSpriteBatch, rect, state.repairium, Color::fromHexRGB(0xff0000));
+      renderBar(oSpriteBatch, rect, std::max(0.f, state.repairium - Constants::REPAIR_RESOURCE_DRAIN_PER_SECOND * 0.5f), Color::White);
+    }
+    else if ( !isHoveringAnyMachine(state))
+    {
+      renderBar(oSpriteBatch, rect, state.repairium, Color::White);
+    }
+    else
+    {
+      renderBar(oSpriteBatch, rect, state.repairium, Color::fromHexRGB(0xff0000));
+      renderBar(oSpriteBatch, rect, std::max(0.f, state.repairium - Constants::REPAIR_UP_FRONT_COST - Constants::REPAIR_RESOURCE_DRAIN_PER_SECOND * 0.5f), Color::White);
+    }
 }
 
 void renderQualityLights(LevelData const& state)
