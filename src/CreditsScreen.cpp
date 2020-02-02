@@ -61,7 +61,7 @@ void CreditsScreen::render()
         " Additional Music: Dr. Matze"
     };
 
-    Vector2 position(10, 50);
+    Vector2 position(10, 70);
 
     for (auto const& Each : Lines)
     {

@@ -36,6 +36,11 @@ struct Engine
     float shake = 1.f;
 };
 
+struct EngineSFX
+{
+    OSoundInstanceRef shakeSound;
+};
+
 struct FluxCapacitor
 {
 };
@@ -50,6 +55,12 @@ struct HoverState
 struct HoverSound
 {
     OSoundInstanceRef background;
+};
+
+struct Overload
+{
+    // < 1.f means no effect, 1.f means effect
+    float Overloaded = 0.f;
 };
 
 enum class Quality

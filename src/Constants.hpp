@@ -16,5 +16,8 @@ namespace Constants
     inline constexpr auto ENGINE_WEAR_PER_SECOND = 0.05f;
     inline constexpr auto ENGINE_SHAKE_DURATION = std::chrono::milliseconds(1200);
 
+    inline constexpr auto FLUX_CAPACITOR_OVERLOAD_TIME = std::chrono::milliseconds(2500);
+    inline constexpr auto FLUX_CAPACITOR_WEAR_PER_SECOND = 0.05f;
+
     int MAX_LEVELS(); // NOTE: Implementation of this is in Levels.cpp!
 }

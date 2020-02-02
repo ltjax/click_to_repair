@@ -17,10 +17,10 @@ void renderMesh(OModel::Mesh* mesh, Matrix const& transform)
 
 void renderHamsters(LevelData const& level, Matrix centerScreen)
 {
-  auto model = OGetModel("hamster.obj");
-  auto view = level.entities.view<Machine const, Hamster const, Hiccup const>();
-  for (auto entity : view)
-  {
+    auto model = OGetModel("hamster.obj");
+    auto view = level.entities.view<Machine const, Hamster const, Hiccup const>();
+    for (auto entity : view)
+    {
         auto const& machine = view.get<Machine const>(entity);
         auto const& hamster = view.get<Hamster const>(entity);
         auto const& hiccup = view.get<Hiccup const>(entity);
@@ -66,11 +66,11 @@ void renderHamsters(LevelData const& level, Matrix centerScreen)
         renderMesh(model->getMesh(4), wheel_transform);
 
         auto stand_transform =
-          Matrix::CreateScale(scaleVec) *
-          Matrix::CreateTranslation(machine.position) *
-          centerScreen;
+            Matrix::CreateScale(scaleVec) *
+            Matrix::CreateTranslation(machine.position) *
+            centerScreen;
         renderMesh(model->getMesh(3), stand_transform);
-  }
+    }
 }
 
 void renderEngines(LevelData const& level, Matrix centerScreen)
@@ -88,33 +88,40 @@ void renderEngines(LevelData const& level, Matrix centerScreen)
     auto shakeFactor = engine.shake * 0.3 * level.animation_factor;
     auto shakeX = std::sin(rand()) * shakeFactor;
     auto shakeY = std::cos(rand()) * shakeFactor;
-    auto shakeTranslation = Matrix::CreateTranslation(shakeX, shakeY, 0.f);
+    auto common_transform =
+        Matrix::CreateTranslation(0.f, -3.f, 0.f) *
+        Matrix::CreateRotationZ(OConvertToRadians(180.f)) *
+        Matrix::CreateTranslation(shakeX, shakeY, 0.f);
     auto cam_shaft_transform =
-        shakeTranslation * 
+        common_transform * 
         Matrix::CreateScale(scale) *
-        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale }) *
+        Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(0), cam_shaft_transform);
   
     auto angle = engine.camShaftAngle * 8.f;
-    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle) - 2.f } * 0.5f;
-    auto piston_offset = Vector2{ 0.f, 3.2f + rod_offset.y };
+    auto rod_offset = Vector2{ std::cos(angle), std::sin(angle)} * 0.5f;
+    auto piston_offset = Vector2{ 0.f, rod_offset.y };
 
     auto rod_transform = 
-        shakeTranslation *
+        Matrix::CreateRotationZ(OConvertToRadians(-rod_offset.x * 17.f)) *
+        common_transform *
         Matrix::CreateTranslation(rod_offset) * 
         Matrix::CreateScale(scale) * 
         Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(1), rod_transform);// rod
 
-    auto head_transform = Matrix::CreateScale(scale) *
-        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale + 25.f }) *
+    auto head_transform =
+        common_transform *
+        Matrix::CreateTranslation(0.f, 1.2f, 0.f) *
+        Matrix::CreateScale(scale) *
+        Matrix::CreateTranslation(machine.position) *
         centerScreen;
     renderMesh(model->getMesh(2), head_transform);
 
     auto piston_transform =
-        shakeTranslation *
+        common_transform *
         Matrix::CreateTranslation(piston_offset) * 
         Matrix::CreateScale(scale) * 
         Matrix::CreateTranslation(machine.position) *
@@ -302,6 +309,24 @@ void renderQualityLights(LevelData const& state)
     }
 }
 
+void renderCriticalMachines(entt::registry const& registry, Matrix const& camera, float animOffset)
+{
+    auto frame = OGetTexture("frame.png");
+    auto frame_size = frame->getSizef();
+    auto arrow = OGetTexture("critical_arrow.png");
+    auto arrow_size = arrow->getSizef();
+    auto view = registry.view<Machine const, QualityStatus const>();
+
+    for (auto entity : view)
+    {
+        if (view.get<QualityStatus const>(entity).current != Quality::Worst)
+            continue;
+
+        auto const& machine = view.get<Machine const>(entity);
+        oSpriteBatch->drawSprite(arrow, Vector2::Transform(machine.position, camera) - Vector2(0, frame_size.y / 2.f + (animOffset - 0.5f) * arrow_size.y / 3.f), Color::White, 0.f, 0.5f);
+    }
+}
+
 void renderCursor(LevelData const& state)
 {
     oInput->setMouseVisible(!state.is_repairing);
@@ -323,13 +348,47 @@ void renderCursor(LevelData const& state)
 }
 
 
+Renderer::Renderer(LevelData const& level_) : level(level_)
+{
+    anim_critical_machines_.play(
+        0.f, // From
+        1.f, // To
+        0.5f, // Duration in Seconds
+        OTweenEaseBoth,
+        OPingPongLoop
+    );
+}
+
+void drawGrid()
+{
+    auto grid = OGetTexture("grid.png");
+    oSpriteBatch->begin();
+    
+    auto g = grid->getSizef();
+    auto s = OScreenf;
+    auto tx = static_cast<int>(std::ceil(s.x / g.x));
+    auto ty = static_cast<int>(std::ceil(s.y / g.y));
+    
+    oRenderer->renderStates.blendMode = OBlendAlpha;
+    for (int y = 0; y < ty; ++y)
+    for (int x = 0; x < tx; ++x)
+    {
+        Rect rect(x*g.x, y*g.y, g.x, g.y);
+        oSpriteBatch->drawRect(grid, rect, Color(1.f, 1.f, 1.f, 0.7f));
+    }
+
+    oSpriteBatch->end();
+}
+
 void Renderer::run()
 {
+    oRenderer->clear(Constants::BackgroundColor());
+    drawGrid();
     oRenderer->setupFor3D({ 0.f, 1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
     oRenderer->set2DCamera(Vector2::Zero);
-    oRenderer->clear(Constants::BackgroundColor());
     oRenderer->setAmbient(Color::White);
     oRenderer->clearDepth();
+
 
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendOpaque;
@@ -345,6 +404,7 @@ void Renderer::run()
     renderDurabilityBar(registry, level.camera);
     renderRepairiumBar(level);
     renderQualityLights(level);
+    renderCriticalMachines(registry, level.camera, anim_critical_machines_);
     oRenderer->renderStates.blendMode = OBlendAlpha;
     renderCursor(level); // should be called last, so it is rendered on top
 
