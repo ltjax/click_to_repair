@@ -342,7 +342,7 @@ void renderCursor(LevelData const& state)
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
-        Vector2(0.1f, 0.1f));
+        Vector2(0.1f, 0.2f));
 }
 
 
