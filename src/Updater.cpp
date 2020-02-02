@@ -86,7 +86,7 @@ void updateRepair(LevelData& state, std::chrono::duration<float> dt)
         }
     }
 
-    if (!was_repairing)
+    if (!was_repairing && state.is_repairing)
     {
         state.started_repairing = true;
     }
