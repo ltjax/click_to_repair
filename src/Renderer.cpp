@@ -240,7 +240,7 @@ void renderQualityLights(LevelData const& state)
     Vector2 positionLeft = positionCenter - offset;
     Vector2 positionRight = positionCenter + offset;
 
-    auto quality = state.quality;
+    auto quality = state.quality.current;
 
     struct { Vector2 position; Color color; } lights[]{
         {positionLeft, quality == Quality::Worst ? OColorRGB(255, 0, 0) : OColorRGB(75, 0, 0)},
