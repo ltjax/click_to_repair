@@ -43,6 +43,7 @@ struct EngineSFX
 
 struct FluxCapacitor
 {
+    float delta = 0.f;
 };
 
 struct HoverState

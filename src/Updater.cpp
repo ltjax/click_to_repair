@@ -45,7 +45,8 @@ void updateFluxCapacitors(LevelData& level, std::chrono::duration<float> dt) {
     auto view = level.entities.view<FluxCapacitor>();
     for (auto entity : view)
     {
-        //auto& flux = view.get<FluxCapacitor>(entity);
+        auto& flux = view.get<FluxCapacitor>(entity);
+        flux.delta += dt.count();
     }
 }
 

@@ -162,17 +162,52 @@ void renderGears(LevelData const& level, Matrix centerScreen)
 void renderFluxCapacitors(LevelData const& level, Matrix centerScreen)
 {
     auto model = OGetModel("flux_capacitor.obj");
-    auto view = level.entities.view<Machine const, FluxCapacitor const>();
+    auto view = level.entities.view<Machine const, FluxCapacitor const, Overload const>();
+  
+    Vector2 const offsets[] = {
+        Vector2{ -1.69507f, 2.6581 },
+        Vector2{ 1.8746f, 0.546213f },
+        Vector2{ -1.91204f, -2.91339 }
+    };
+
+    float const arm_initial_rotation[] = {
+        OConvertToRadians(110.f),
+        OConvertToRadians(240.f),
+        OConvertToRadians(50.f)
+    };
+    auto const max_angle = OConvertToRadians(25.f);
+    auto constexpr socket_offset = 2;
+
     for (auto entity : view)
     {
+        auto const& flux = view.get<FluxCapacitor const>(entity);
         auto const& machine = view.get<Machine const>(entity);
+        auto const& overload = view.get<Overload const>(entity);
+
         auto boundsX = std::abs(model->getBoundingBox()->x);
         auto scale = machine.size / (2.f * boundsX);
-        auto flux_box_transform =
-            Matrix::CreateScale(scale) * 
+
+        auto overload_multiplier = overload.Overloaded * std::sin(5000.f * flux.delta);
+        auto arm_rotation = std::sin((5.f + overload_multiplier) * flux.delta) * max_angle;
+        auto common_transform =
+            Matrix::CreateTranslation(overload_multiplier, 0.f, 0.f) *
+            Matrix::CreateScale(scale) *
             Matrix::CreateTranslation(machine.position - Vector2{ 0.f, -1.f * scale }) *
             centerScreen;
-        renderMesh(model->getMesh(0), flux_box_transform);
+
+        for (auto i = 0; i < 3; ++i)
+            renderMesh(model->getMesh(socket_offset + i), common_transform);
+
+        for (auto i = 0; i < 3; ++i) 
+        {
+            auto flux_box_transform =
+                Matrix::CreateRotationZ(arm_initial_rotation[2 - i] + arm_rotation) *
+                Matrix::CreateTranslation(offsets[i]) *
+                common_transform;
+            renderMesh(model->getMesh(0), flux_box_transform);
+        }
+
+        renderMesh(model->getMesh(1), common_transform);
     }
 }
 
