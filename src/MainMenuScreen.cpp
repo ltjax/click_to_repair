@@ -49,6 +49,8 @@ MainMenuScreen::MainMenuScreen(std::shared_ptr<SharedState> sharedState_)
     OTweenEaseBoth,
     OPingPongLoop
   );
+  backgroundMusic = OGetMusic("background_music.ogg");
+  backgroundMusic->play();
 }
 
 Screen::ScreenFactory MainMenuScreen::update(std::chrono::duration<float> dt)

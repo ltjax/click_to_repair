@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <chrono>
+#include <onut/Music.h>
 #include <functional>
 
 struct Screen
@@ -11,4 +12,6 @@ struct Screen
         return {};
     }
     virtual void render() {}
+
+    OMusicRef backgroundMusic;
 };
