@@ -348,13 +348,36 @@ Renderer::Renderer(LevelData const& level_) : level(level_)
     );
 }
 
+void drawGrid()
+{
+    auto grid = OGetTexture("grid.png");
+    oSpriteBatch->begin();
+    
+    auto g = grid->getSizef();
+    auto s = OScreenf;
+    auto tx = static_cast<int>(std::ceil(s.x / g.x));
+    auto ty = static_cast<int>(std::ceil(s.y / g.y));
+    
+    oRenderer->renderStates.blendMode = OBlendAlpha;
+    for (int y = 0; y < ty; ++y)
+    for (int x = 0; x < tx; ++x)
+    {
+        Rect rect(x*g.x, y*g.y, g.x, g.y);
+        oSpriteBatch->drawRect(grid, rect, Color(1.f, 1.f, 1.f, 0.7f));
+    }
+
+    oSpriteBatch->end();
+}
+
 void Renderer::run()
 {
+    oRenderer->clear(Constants::BackgroundColor());
+    drawGrid();
     oRenderer->setupFor3D({ 0.f, 1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
     oRenderer->set2DCamera(Vector2::Zero);
-    oRenderer->clear(Constants::BackgroundColor());
     oRenderer->setAmbient(Color::White);
     oRenderer->clearDepth();
+
 
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendOpaque;
