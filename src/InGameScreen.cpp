@@ -8,9 +8,7 @@
 InGameScreen::InGameScreen(std::shared_ptr<SharedState> sharedState_, int levelNumber_)
     : sharedState(sharedState_), levelNumber(levelNumber_), level(create_level(levelNumber)), updater(level), renderer(level)
 {
-    std::string music_choices[]{ "background_music.ogg", "background_music_2.ogg", "ChillDustrial_v0.ogg" };
-    int x = std::rand() % std::size(music_choices);
-    backgroundMusic = OGetMusic(music_choices[x]);
+    backgroundMusic = OGetMusic(sharedState_->music.getNext_music(sharedState_->rng));
     backgroundMusic->play();
 }
 

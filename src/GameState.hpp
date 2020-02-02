@@ -1,22 +1,35 @@
 #pragma once
 #include <memory>
 #include "Screen.hpp"
+#include <random>
+#include "MultipleOutcomePrng.hpp"
 
 struct Progress
 {
-  int next_available_level = 0;
+    int next_available_level = 0;
 
-  void load();
-  void save();
+    void load();
+    void save();
+};
+
+struct MusicPicker
+{
+    MusicPicker();
+    std::string const& getNext_music(std::mt19937& rng);
+private:
+    CMultipleOutcomePrng distribtion;
+
 };
 
 struct SharedState
 {
-  Progress progress;
+    Progress progress;
+    std::mt19937 rng;
+    MusicPicker music;
 };
 
 struct GameState
 {
-  std::unique_ptr<Screen> menu_state;
-  std::shared_ptr<SharedState> shared_state;
+    std::unique_ptr<Screen> menu_state;
+    std::shared_ptr<SharedState> shared_state;
 };
