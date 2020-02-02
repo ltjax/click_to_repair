@@ -16,6 +16,8 @@ struct MainMenuScreen : Screen
   std::optional<int> level_in_focus;
 
   OAnimFloat anim_current_level_;
+  OAnimFloat anim_mouse_;
+  OAnimFloat anim_arrow_;
   OAnimFloat anim_main_logo_;
   
   ~MainMenuScreen()
