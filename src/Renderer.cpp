@@ -96,12 +96,17 @@ void renderEngines(entt::registry const& registry, Matrix centerScreen)
       centerScreen;
     renderMesh(model->getMesh(1), rod_transform);// rod
 
+    auto head_transform = Matrix::CreateScale(scale) *
+        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale + 10.f }) *
+        centerScreen;
+    renderMesh(model->getMesh(2), head_transform);
+
     auto piston_transform = 
       Matrix::CreateTranslation(piston_offset) * 
       Matrix::CreateScale(scale) * 
       Matrix::CreateTranslation(machine.position) *
       centerScreen;
-    renderMesh(model->getMesh(2), piston_transform); // render piston
+    renderMesh(model->getMesh(3), piston_transform); // render piston
   }
 }
 
