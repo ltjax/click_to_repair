@@ -44,7 +44,7 @@ void updateFluxCapacitors(LevelData& level, std::chrono::duration<float> dt) {
     auto view = level.entities.view<FluxCapacitor>();
     for (auto entity : view)
     {
-        auto& flux = view.get<FluxCapacitor>(entity);
+        //auto& flux = view.get<FluxCapacitor>(entity);
     }
 }
 
@@ -302,6 +302,29 @@ void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
         OPlaySound("engine_up.wav", 1.f);
 }
 
+void updateQualityWarning(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<QualityStatus, Machine>();
+
+    for (auto entity : view)
+    {
+        auto& quality = view.get<QualityStatus>(entity);
+        auto& machine = view.get<Machine>(entity);
+
+        if (quality.current < quality.previous)
+        {
+            machine.warningDuration = std::chrono::milliseconds(100);
+        }
+        else
+        {
+            machine.warningDuration -= dt;
+        }
+
+    }
+
+}
+
 void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
@@ -521,6 +544,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateWear(level, dt);
     updateGearQuality(level, dt);
     updateEngineQuality(level, dt);
+    updateQualityWarning(level,dt);
     updateHamsterQuality(level, dt);
     updateFluxCapacitorQuality(level, dt);
     updateGlobalQuality(level, dt);

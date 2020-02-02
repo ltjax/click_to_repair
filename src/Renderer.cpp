@@ -204,15 +204,26 @@ void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
 {
     auto frame = OGetTexture("frame.png");
     auto frame_size = frame->getSizef();
-    auto view = registry.view<Machine const>();
+    auto view = registry.view<Machine const, QualityStatus const>();
 
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
+        auto const& quality = view.get<QualityStatus const>(entity);
+
         auto rotation = 0.f;
         if (auto hover = registry.try_get<HoverState const>(entity); hover && hover->containsMouse)
           rotation = 3.f * std::sin(5.f * hover->timeIn.count()) + 2.f;
-        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), Color::White, rotation);
+
+        Color color = Color::White; 
+
+        if (machine.warningDuration > std::chrono::duration<float>::zero()) 
+        {
+            color = colorForQuality(quality.current);
+
+        }
+        oSpriteBatch->drawSprite(frame, Vector2::Transform(machine.position, camera), color , rotation);
+
     }
 }
 
@@ -348,13 +359,36 @@ Renderer::Renderer(LevelData const& level_) : level(level_)
     );
 }
 
+void drawGrid()
+{
+    auto grid = OGetTexture("grid.png");
+    oSpriteBatch->begin();
+    
+    auto g = grid->getSizef();
+    auto s = OScreenf;
+    auto tx = static_cast<int>(std::ceil(s.x / g.x));
+    auto ty = static_cast<int>(std::ceil(s.y / g.y));
+    
+    oRenderer->renderStates.blendMode = OBlendAlpha;
+    for (int y = 0; y < ty; ++y)
+    for (int x = 0; x < tx; ++x)
+    {
+        Rect rect(x*g.x, y*g.y, g.x, g.y);
+        oSpriteBatch->drawRect(grid, rect, Color(1.f, 1.f, 1.f, 0.7f));
+    }
+
+    oSpriteBatch->end();
+}
+
 void Renderer::run()
 {
+    oRenderer->clear(Constants::BackgroundColor());
+    drawGrid();
     oRenderer->setupFor3D({ 0.f, 1.f, 0.f }, Vector3::Zero, Vector3::Up, 90.f);
     oRenderer->set2DCamera(Vector2::Zero);
-    oRenderer->clear(Constants::BackgroundColor());
     oRenderer->setAmbient(Color::White);
     oRenderer->clearDepth();
+
 
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendOpaque;
