@@ -1,6 +1,7 @@
 #include "MainMenuScreen.hpp"
 #include "InGameScreen.hpp"
 #include "Constants.hpp"
+#include "utils.hpp"
 #include <onut/Input.h>
 #include <onut/onut.h>
 #include <onut/Renderer.h>
@@ -25,10 +26,6 @@ namespace {
   {
     Vector2 size(96);
     return { OScreenWf - size.x, 0, size };
-  }
-  Color get_color_focus(Rect const& rect)
-  {
-    return rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
   }
 }
 
@@ -61,7 +58,7 @@ Screen::Factory MainMenuScreen::update(std::chrono::duration<float> dt)
       return {};
   }
 
-  if (OInputPressed(OMouse1))
+  if (OInputJustPressed(OMouse1))
   {
       auto const& progress = sharedState->progress;
       for (int level = 0; level <= progress.next_available_level; ++level)

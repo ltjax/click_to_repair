@@ -1,5 +1,7 @@
 #pragma once
 #include <onut/Vector4.h>
+#include <onut/Color.h>
+#include <onut/Input.h>
 
 inline Rect enlargeRect(Rect input, Vector2 size)
 {
@@ -14,4 +16,9 @@ inline Rect shrinkRect(Rect input, Vector2 size)
 inline Vector2 inverseComponents(Vector2 p)
 {
     return Vector2(1.f / p.x, 1.f / p.y);
+}
+
+inline Color get_color_focus(Rect const& rect)
+{
+  return rect.Contains(oInput->mousePosf) ? Color::White : Color{ 0.9f,0.9f,0.9f,1.f };
 }
