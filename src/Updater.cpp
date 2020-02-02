@@ -44,7 +44,7 @@ void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
     using D = std::uniform_real_distribution<float>;
 
     auto& registry = state.entities;
-    auto hiccupDurabilityLoss = state.quality != Quality::Worst ? D(0.07f, 0.085f) : D(0.15f, 0.2f);
+    auto hiccupDurabilityLoss = state.quality.current != Quality::Worst ? D(0.07f, 0.085f) : D(0.15f, 0.2f);
     D hiccupPause(2.0f, 2.4f);
     auto view = registry.view<Hamster>();
     for (auto entity : view)
@@ -238,12 +238,34 @@ void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
     entt::registry& registry = state.entities;
     auto view = registry.view<QualityStatus>();
 
-    state.quality = Quality::Good;
+    state.quality.previous = state.quality.current;
+    state.quality.current = Quality::Good;
     for (auto entity : view)
     {
         auto& quality = view.get<QualityStatus>(entity).current;
 
-        state.quality = std::min(state.quality, quality);
+        state.quality.current = std::min(state.quality.current, quality);
+    }
+}
+
+void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<GlobalQualitySound>();
+
+    for (auto entity :view)
+    {
+        auto sound = view.get<GlobalQualitySound>(entity);
+
+        if (state.quality.current > state.quality.previous)
+        {
+            sound.positiveNotification->play();
+        }
+
+        if (state.quality.current < state.quality.previous)
+        {
+            sound.negativeNotification->play();
+        }
     }
 
 }
@@ -328,6 +350,28 @@ void updateRepairTime(LevelData& state, std::chrono::duration<float> dt)
     }
 }
 
+void updateQualityTransitions(LevelData& state, std::chrono::duration<float> dt)
+{
+    entt::registry& registry = state.entities;
+    auto view = registry.view<Engine, Durability, QualityStatus>();
+
+    for (auto entity : view)
+    {
+        auto& quality = view.get<QualityStatus>(entity);
+
+
+        if (quality.current > quality.previous) 
+        {
+
+        } 
+
+        if (quality.current < quality.previous) 
+        {
+
+        }
+    }
+}
+
 void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 {
     if (state.is_repairing)
@@ -340,13 +384,13 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
         return; // No new repairium if we repair
     }
 
-    if (state.quality == Quality::Worst)
+    if (state.quality.current == Quality::Worst)
     {
         // machine is stopped
         return;
     }
 
-    if (state.quality == Quality::Good)
+    if (state.quality.current == Quality::Good)
     {
         // machine is in SUPER condition and run
         state.repairium += 0.1f * dt.count();
@@ -356,6 +400,7 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
     // normal condition
     state.repairium += 0.05f * dt.count();
 }
+
 
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
@@ -374,6 +419,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateEngineQuality(level, dt);
     updateHamsterQuality(level, dt);
     updateGlobalQuality(level, dt);
+    updateGlobalQualitySound(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
 

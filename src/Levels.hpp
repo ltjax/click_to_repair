@@ -3,19 +3,14 @@
 #include <entt/entt.hpp>
 #include <onut/Matrix.h>
 #include <random>
+#include "Components.hpp"
 
-enum class Quality
-{
-    Worst,
-    Medium,
-    Good
-};
 
 struct LevelData
 {
     entt::registry entities;
     float repairium = 0.f;
-    Quality quality = Quality::Good;
+    QualityStatus quality;
     bool is_repairing = false;
     bool started_repairing = false;
     float repair_time = 0.f;
