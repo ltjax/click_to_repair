@@ -47,13 +47,6 @@ struct HoverSound
     OSoundInstanceRef background;
 };
 
-
-struct GlobalQualitySound
-{
-    OSoundInstanceRef positiveNotification;
-    OSoundInstanceRef negativeNotification;
-};
-
 enum class Quality
 {
     Worst,

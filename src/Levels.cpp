@@ -36,15 +36,6 @@ entt::entity createHamster(entt::registry& registry, Vector2 position, float dur
     return hamster;
 }
 
-entt::entity createGlobalQualitySound(entt::registry& registry)
-{
-    auto entity = registry.create();
-    registry.assign<GlobalQualitySound>(entity, OCreateSoundInstance("positive_sound.wav"),
-            OCreateSoundInstance("negative_sound.wav"));
-
-    return entity;
-}
-
 void level0(entt::registry& registry, LevelData& state)
 {
     createGear(registry, Vector2{0.f}, 0.2f);

@@ -275,24 +275,11 @@ void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 
 void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
 {
-    entt::registry& registry = state.entities;
-    auto view = registry.view<GlobalQualitySound>();
+    if (state.quality.current == Quality::Worst && state.quality.previous != Quality::Worst)
+        OPlaySound("engine_down.wav", 0.5f);
 
-    for (auto entity : view)
-    {
-        auto sound = view.get<GlobalQualitySound>(entity);
-
-        if (state.quality.current > state.quality.previous)
-        {
-            sound.positiveNotification->play();
-        }
-
-        if (state.quality.current < state.quality.previous)
-        {
-            sound.negativeNotification->play();
-        }
-    }
-
+    if (state.quality.current != Quality::Worst && state.quality.previous == Quality::Worst)
+        OPlaySound("engine_up.wav", 1.f);
 }
 
 void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
