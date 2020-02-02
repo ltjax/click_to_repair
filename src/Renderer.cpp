@@ -15,22 +15,26 @@ void renderMesh(OModel::Mesh* mesh, Matrix const& transform)
   oRenderer->drawIndexed(mesh->elementCount);
 }
 
-void renderHamsters(entt::registry const& registry, Matrix centerScreen)
+void renderHamsters(LevelData const& level, Matrix centerScreen)
 {
   auto model = OGetModel("hamster.obj");
-  auto view = registry.view<Machine const, Hamster const>();
+  auto view = level.entities.view<Machine const, Hamster const, Hiccup const>();
   for (auto entity : view)
   {
         auto const& machine = view.get<Machine const>(entity);
         auto const& hamster = view.get<Hamster const>(entity);
+        auto const& hiccup = view.get<Hiccup const>(entity);
+
         auto boundsX = std::abs(model->getBoundingBox()->x);
         auto scale = machine.size / (2.f * boundsX);
         auto scaleVec = Vector3{ scale, -scale, 1.f };
+        auto jumpTransform = Matrix::CreateTranslation(0.f, 2.f * hiccup.jump_height, 0.f);
 
         auto hindLegAngle = std::sin(1000.f * OConvertToRadians(hamster.delta)) * 0.75f - 0.5f;
         auto frontLegAngle = std::sin(2000.f + 1000.f * OConvertToRadians(hamster.delta)) * 0.75f - 0.5f;
         auto hindLegTransform =
             Matrix::CreateRotationZ(hindLegAngle) *
+            jumpTransform *
             Matrix::CreateTranslation(Vector2{ -0.65f, -1.3f }) *
             Matrix::CreateScale(scaleVec) *
             Matrix::CreateTranslation(machine.position) *
@@ -39,6 +43,7 @@ void renderHamsters(entt::registry const& registry, Matrix centerScreen)
     
         auto frontLegTransform =
             Matrix::CreateRotationZ(frontLegAngle) *
+            jumpTransform *
             Matrix::CreateTranslation(Vector2{ 0.55f, -1.6f }) *
             Matrix::CreateScale(scaleVec) *
             Matrix::CreateTranslation(machine.position) *
@@ -46,6 +51,7 @@ void renderHamsters(entt::registry const& registry, Matrix centerScreen)
         renderMesh(model->getMesh(0), frontLegTransform);
 
         auto hamsterTransform =
+            jumpTransform *
             Matrix::CreateTranslation(Vector2{ 0.f, -1.3f }) *
             Matrix::CreateScale(scaleVec) *
             Matrix::CreateTranslation(machine.position) *
@@ -67,10 +73,10 @@ void renderHamsters(entt::registry const& registry, Matrix centerScreen)
   }
 }
 
-void renderEngines(entt::registry const& registry, Matrix centerScreen)
+void renderEngines(LevelData const& level, Matrix centerScreen)
 {
   auto model = OGetModel("engine.obj");
-  auto view = registry.view<Machine const, Engine const>();
+  auto view = level.entities.view<Machine const, Engine const>();
   for (auto entity : view)
   {
     auto const& machine = view.get<Machine const>(entity);
@@ -79,7 +85,12 @@ void renderEngines(entt::registry const& registry, Matrix centerScreen)
     auto boundsX = std::abs(model->getBoundingBox()->x);
     auto scale = machine.size / (2.5f * boundsX);
 
+    auto shakeFactor = engine.shake * 0.3 * level.animation_factor;
+    auto shakeX = std::sin(rand()) * shakeFactor;
+    auto shakeY = std::cos(rand()) * shakeFactor;
+    auto shakeTranslation = Matrix::CreateTranslation(shakeX, shakeY, 0.f);
     auto cam_shaft_transform =
+        shakeTranslation * 
         Matrix::CreateScale(scale) *
         Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale }) *
         centerScreen;
@@ -90,30 +101,32 @@ void renderEngines(entt::registry const& registry, Matrix centerScreen)
     auto piston_offset = Vector2{ 0.f, 3.2f + rod_offset.y };
 
     auto rod_transform = 
-      Matrix::CreateTranslation(rod_offset) * 
-      Matrix::CreateScale(scale) * 
-      Matrix::CreateTranslation(machine.position) *
-      centerScreen;
+        shakeTranslation *
+        Matrix::CreateTranslation(rod_offset) * 
+        Matrix::CreateScale(scale) * 
+        Matrix::CreateTranslation(machine.position) *
+        centerScreen;
     renderMesh(model->getMesh(1), rod_transform);// rod
 
     auto head_transform = Matrix::CreateScale(scale) *
-        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale + 10.f }) *
+        Matrix::CreateTranslation(machine.position - Vector2{ 0.f, scale + 25.f }) *
         centerScreen;
     renderMesh(model->getMesh(2), head_transform);
 
-    auto piston_transform = 
-      Matrix::CreateTranslation(piston_offset) * 
-      Matrix::CreateScale(scale) * 
-      Matrix::CreateTranslation(machine.position) *
-      centerScreen;
+    auto piston_transform =
+        shakeTranslation *
+        Matrix::CreateTranslation(piston_offset) * 
+        Matrix::CreateScale(scale) * 
+        Matrix::CreateTranslation(machine.position) *
+        centerScreen;
     renderMesh(model->getMesh(3), piston_transform); // render piston
   }
 }
 
-void renderGears(entt::registry const& registry, Matrix centerScreen)
+void renderGears(LevelData const& level, Matrix centerScreen)
 {
     auto model = OGetModel("gears.obj");
-    auto view = registry.view<Machine const, Gear const>();
+    auto view = level.entities.view<Machine const, Gear const>();
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
@@ -293,9 +306,9 @@ void Renderer::run()
     auto& registry = level.entities;
     oRenderer->renderStates.blendMode = OBlendOpaque;
     oRenderer->renderStates.backFaceCull = false;
-    renderGears(registry, level.camera);
-    renderEngines(registry, level.camera);
-    renderHamsters(registry, level.camera);
+    renderGears(level, level.camera);
+    renderEngines(level, level.camera);
+    renderHamsters(level, level.camera);
 
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     oSpriteBatch->begin();

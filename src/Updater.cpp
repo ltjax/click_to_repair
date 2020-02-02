@@ -8,30 +8,31 @@
 #include <random>
 #include <onut/Renderer.h>
 
-void updateGears(entt::registry& registry, std::chrono::duration<float> dt)
+void updateGears(LevelData& level, std::chrono::duration<float> dt)
 {
-    auto view = registry.view<Gear>();
+    auto view = level.entities.view<Gear>();
     for (auto entity : view)
     {
         auto& gear = view.get<Gear>(entity);
-        gear.rotation = Matrix::CreateRotationZ(dt.count()) * gear.rotation;
+        gear.rotation = Matrix::CreateRotationZ(level.animation_factor * dt.count()) * gear.rotation;
         gear.delta += dt.count();
     }
 }
 
-void updateEngines(entt::registry& registry, std::chrono::duration<float> dt)
+void updateEngines(LevelData& level, std::chrono::duration<float> dt)
 {
-    auto view = registry.view<Engine>();
+    auto view = level.entities.view<Engine>();
+
     for (auto entity : view)
     {
         auto& engine = view.get<Engine>(entity);
-        engine.camShaftAngle += dt.count();
+        engine.camShaftAngle += level.animation_factor * dt.count();
     }
 }
 
-void updateHamsters(entt::registry& registry, std::chrono::duration<float> dt)
+void updateHamsters(LevelData& level, std::chrono::duration<float> dt)
 {
-    auto view = registry.view<Hamster>();
+    auto view = level.entities.view<Hamster>();
     for (auto entity : view)
     {
         auto& hamster = view.get<Hamster>(entity);
@@ -46,19 +47,22 @@ void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
     auto& registry = state.entities;
     auto hiccupDurabilityLoss = state.quality.current != Quality::Worst ? D(0.07f, 0.085f) : D(0.15f, 0.2f);
     D hiccupPause(2.0f, 2.4f);
-    auto view = registry.view<Hamster>();
+    auto view = registry.view<Hamster, Hiccup>();
     for (auto entity : view)
     {
         auto& hamster = view.get<Hamster>(entity);
+        auto& hiccup = view.get<Hiccup>(entity);
         if (hamster.nextHiccup <= std::chrono::duration<float>{0})
         {
             hamster.decay += hiccupDurabilityLoss(state.rng);
             hamster.nextHiccup = std::chrono::duration<float>(hiccupPause(state.rng));
-            registry.assign<Hiccup>(entity, "hiccup.wav");
+            hiccup.sound_played = false;
+            hiccup.jump_height = 1.f;
         }
         else
         {
             hamster.nextHiccup -= dt;
+            hiccup.jump_height = std::max(hiccup.jump_height - 2.f * dt.count(), 0.f);
         }
     }
 }
@@ -69,8 +73,10 @@ void updateHiccupEffects(entt::registry& registry)
     for (auto entity : view)
     {
         auto& hiccup = view.get<Hiccup>(entity);
-        OPlaySound(hiccup.sfxFilename);
-        registry.remove<Hiccup>(entity);
+        if (!hiccup.sound_played) {
+            OPlaySound(hiccup.sound_file);
+            hiccup.sound_played = true;
+        }
     }
 }
 
@@ -102,6 +108,13 @@ void updateRepair(LevelData& state, std::chrono::duration<float> dt)
     {
         state.started_repairing = true;
     }
+}
+
+void updateAnimationFactor(LevelData& state)
+{
+    float quality_factor = state.quality.current == Quality::Worst ? 0.f : 1.f;
+    float repair_factor = state.is_repairing ? 0.f : 1.f;
+    state.animation_factor = quality_factor * repair_factor;
 }
 
 void updateGearWear(LevelData& state, std::chrono::duration<float> dt)
@@ -252,10 +265,10 @@ void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 
     state.quality.previous = state.quality.current;
     state.quality.current = Quality::Good;
+
     for (auto entity : view)
     {
         auto& quality = view.get<QualityStatus>(entity).current;
-
         state.quality.current = std::min(state.quality.current, quality);
     }
 }
@@ -265,7 +278,7 @@ void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
     entt::registry& registry = state.entities;
     auto view = registry.view<GlobalQualitySound>();
 
-    for (auto entity :view)
+    for (auto entity : view)
     {
         auto sound = view.get<GlobalQualitySound>(entity);
 
@@ -370,12 +383,12 @@ void updateQualityTransitions(LevelData& state, std::chrono::duration<float> dt)
         auto& quality = view.get<QualityStatus>(entity);
 
 
-        if (quality.current > quality.previous) 
+        if (quality.current > quality.previous)
         {
 
-        } 
+        }
 
-        if (quality.current < quality.previous) 
+        if (quality.current < quality.previous)
         {
 
         }
@@ -384,6 +397,8 @@ void updateQualityTransitions(LevelData& state, std::chrono::duration<float> dt)
 
 void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
 {
+    state.last_repairium = state.repairium;
+
     if (state.is_repairing)
     {
         if (state.started_repairing)
@@ -404,6 +419,22 @@ void updateRepairum(LevelData& state, std::chrono::duration<float> dt)
     state.repairium += reparium_per_second * dt.count();
 }
 
+void playRepairiumSounds(LevelData& state)
+{
+    auto N = 8;
+    auto s = 1.f / (N + 1);
+
+    auto j = std::floor(state.repairium / s);
+    if (std::floor(state.last_repairium / s) < j)
+    {
+        auto soundIndex = static_cast<int>(j);
+        if (soundIndex <= 0 || soundIndex > N)
+            return;
+
+        OPlaySound("bell.wav", 0.5f, 0.f, 1.f + j * 0.05f);
+    }
+}
+
 
 std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
 {
@@ -412,9 +443,9 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     auto& registry = level.entities;
     updateHoverStates(registry, dt, level.camera);
     updateHoverSounds(registry);
-    updateGears(registry, dt);
-    updateEngines(registry, dt);
-    updateHamsters(registry, dt);
+    updateGears(level, dt);
+    updateEngines(level, dt);
+    updateHamsters(level, dt);
     updateHamsterHiccups(level, dt);
     updateHiccupEffects(registry);
     updateRepair(level, dt);
@@ -426,6 +457,8 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGlobalQualitySound(level, dt);
     updateRepairTime(level, dt);
     updateRepairum(level, dt);
+    updateAnimationFactor(level);
+    playRepairiumSounds(level);
 
     if (level.repairium >= 1.0f)
     {

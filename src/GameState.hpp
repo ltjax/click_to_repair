@@ -7,9 +7,6 @@
 struct Progress
 {
     int next_available_level = 0;
-
-    void load();
-    void save();
 };
 
 struct MusicPicker
@@ -26,6 +23,10 @@ struct SharedState
     Progress progress;
     std::mt19937 rng;
     MusicPicker music;
+  bool is_fullscreen = false;
+
+    void load();
+    void save();
 };
 
 struct GameState

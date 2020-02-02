@@ -338,6 +338,13 @@ namespace onut
             // Sync to main callbacks
             oDispatcher->processQueue();
 
+            {
+              auto target_resolution = oRenderer->getTrueResolution();
+              if (oSettings->getIsRetroMode())
+                target_resolution = oSettings->getRetroResolution();
+              if (g_pMainRenderTarget->getSize() != target_resolution)
+                g_pMainRenderTarget = OTexture::createScreenRenderTarget();
+            }
             // Update
             oAudioEngine->update();
             auto framesToUpdate = oTiming->update(oSettings->getIsFixedStep());
