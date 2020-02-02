@@ -21,6 +21,12 @@ entt::entity createGear(entt::registry& registry, Vector2 position, float durabi
     return gear;
 }
 
+entt::entity createFluxCapacitor(entt::registry& registry, Vector2 position, float durability) {
+    auto flux = createPart(registry, position, durability, "flux_capacitor.wav");
+    registry.assign<FluxCapacitor>(flux);
+    return flux;
+}
+
 entt::entity createEngine(entt::registry& registry, Vector2 position, float durability)
 {
     auto engine = createPart(registry, position, durability, "ambient_machine1.wav");

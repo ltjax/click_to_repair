@@ -40,6 +40,14 @@ void updateHamsters(LevelData& level, std::chrono::duration<float> dt)
     }
 }
 
+void updateFluxCapacitors(LevelData& level, std::chrono::duration<float> dt) {
+    auto view = level.entities.view<FluxCapacitor>();
+    for (auto entity : view)
+    {
+        auto& flux = view.get<FluxCapacitor>(entity);
+    }
+}
+
 void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
 {
     using D = std::uniform_real_distribution<float>;
@@ -446,6 +454,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(level, dt);
     updateEngines(level, dt);
     updateHamsters(level, dt);
+    updateFluxCapacitors(level, dt);
     updateHamsterHiccups(level, dt);
     updateHiccupEffects(registry);
     updateRepair(level, dt);
