@@ -86,6 +86,16 @@ void level5(entt::registry& registry, LevelData& state)
     createHamster(registry, Vector2(300.f, 0.f), 0.75f);
 }
 
+void level6(entt::registry& registry, LevelData& state)
+{
+    float x = 160.f;
+    float y = 125.f;
+    createGear(registry, Vector2(-x, -y), 1.f);
+    createFluxCapacitor(registry, Vector2(-x, y), 0.75f);
+    createFluxCapacitor(registry, Vector2(x, -y), 0.75f);
+    createHamster(registry, Vector2(x, y), 1.0f);
+}
+
 using LevelFunc = void (*)(entt::registry&, LevelData&);
 LevelFunc levels[] = {
     level0,
@@ -94,6 +104,7 @@ LevelFunc levels[] = {
     level3,
     level4,
     level5,
+    level6,
 };
 constexpr auto MAX_LEVEL = std::size(levels);
 namespace Constants
