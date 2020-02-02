@@ -335,7 +335,7 @@ void renderCursor(LevelData const& state)
     auto icon_wrench = OGetTexture("wrench.png");
     auto textureSize = icon_wrench->getSizef();
 
-    const float targetSize = 96;
+    const float targetSize = 192;
     static float rot_time;
     auto s = std::sin(state.repair_time * 7.f);
     float rotation = (s < 0 ? 1.f : -1.f) * (s * s) * 25.f;
