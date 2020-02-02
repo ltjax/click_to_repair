@@ -39,6 +39,7 @@ Color colorForDuration(float duration)
 
 void renderBar(OSpriteBatchRef spriteBatch, Rect rectangle, float fullness, Color color)
 {
+    oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     auto texture = OGetTexture("bar.png");
     auto contentRect = shrinkRect(rectangle, Vector2{ 4 });
     contentRect.z *= fullness;
