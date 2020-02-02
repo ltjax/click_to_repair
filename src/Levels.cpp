@@ -74,7 +74,7 @@ void level4(entt::registry& registry, LevelData& state)
     createGear(registry, Vector2(-x, y), 0.75f);
     createGear(registry, Vector2(x, -y), 0.75f);
     createHamster(registry, Vector2(x, y), 1.0f);
-    state.reparium_multiplier = 1.5f;
+    state.reparium_multiplier = 1.25f;
 }
 
 using LevelFunc = void (*)(entt::registry&, LevelData&);

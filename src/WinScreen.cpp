@@ -12,8 +12,7 @@ WinScreen::WinScreen(std::shared_ptr<SharedState> sharedState, int finished_leve
   : sharedState_(sharedState), finished_level_(finished_level)
 {
     checkmark_ = OGetTexture("level_complete.png");
-    sound_ = OCreateSoundInstance("level_complete.wav");
-    sound_->play();
+    OPlaySound("level_complete.wav");
 
     anim_.play(
         2.f, // From

@@ -3,12 +3,15 @@
 #include <onut/Font.h>
 #include <onut/SpriteBatch.h>
 #include <onut/Input.h>
+#include <onut/Sound.h>
 #include "Constants.hpp"
 #include "MainMenuScreen.hpp"
 
 CreditsScreen::CreditsScreen(std::shared_ptr<SharedState> sharedState)
     : sharedState_(sharedState)
 {
+    OPlaySound("level_complete.wav");
+
     anim_.play(
         -20.f, // From
         20.f, // To
@@ -58,7 +61,7 @@ void CreditsScreen::render()
         " Additional Music: Dr. Matze"
     };
 
-    Vector2 position(10, 10);
+    Vector2 position(10, 50);
 
     for (auto const& Each : Lines)
     {
