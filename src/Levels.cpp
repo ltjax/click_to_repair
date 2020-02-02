@@ -31,6 +31,7 @@ entt::entity createEngine(entt::registry& registry, Vector2 position, float dura
 {
     auto engine = createPart(registry, position, durability, "ambient_machine1.wav");
     registry.assign<Engine>(engine);
+    registry.assign<EngineSFX>(engine, OCreateSoundInstance("engine_shake.wav"));
     return engine;
 }
 

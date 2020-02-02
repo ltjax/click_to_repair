@@ -309,23 +309,35 @@ void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
 void updateEngineQuality(LevelData& state, std::chrono::duration<float> dt)
 {
     entt::registry& registry = state.entities;
-    auto view = registry.view<Engine, Durability, QualityStatus>();
+    auto view = registry.view<Engine, EngineSFX, Durability, QualityStatus>();
 
     for (auto entity : view)
     {
         auto& durability = view.get<Durability>(entity).durability;
         auto& quality = view.get<QualityStatus>(entity);
         auto& engine = view.get<Engine>(entity);
+        auto& engineSfx = view.get<EngineSFX>(entity);
 
         quality.previous = quality.current;
         quality.current = computeQuality(durability, 0.05, 0.75);
         if (quality.current == Quality::Good)
         {
             engine.shake = 1.f;
+            if (!engineSfx.shakeSound->isPlaying())
+            {
+                engineSfx.shakeSound->setLoop(true);
+                engineSfx.shakeSound->setVolume(1.f);
+                engineSfx.shakeSound->play();
+            }
         }
         else
         {
             engine.shake = std::max(0.f, engine.shake - dt / Constants::ENGINE_SHAKE_DURATION);
+            engineSfx.shakeSound->setVolume(engine.shake);
+            if (engine.shake == 0.f)
+            {
+                engineSfx.shakeSound->stop();
+            }
         }
     }
 }

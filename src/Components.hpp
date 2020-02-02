@@ -35,6 +35,11 @@ struct Engine
     float shake = 1.f;
 };
 
+struct EngineSFX
+{
+    OSoundInstanceRef shakeSound;
+};
+
 struct FluxCapacitor
 {
 };
