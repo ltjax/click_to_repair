@@ -25,6 +25,14 @@
 // Global game state
 GameState gameState;
 
+namespace {
+  Rect get_fullscreen_rect()
+  {
+    Vector2 size(96);
+    return {0, 0, size };
+  }
+}
+
 void initSettings()
 {
     oSettings->setGameName("Click to repair!");
@@ -43,7 +51,8 @@ void init()
 
 void update()
 {
-    if ((OInputPressed(OKeyLeftAlt) || OInputPressed(OKeyRightAlt)) && OInputJustPressed(OKeyEnter))
+    if (((OInputPressed(OKeyLeftAlt) || OInputPressed(OKeyRightAlt)) && OInputJustPressed(OKeyEnter))
+      || (get_fullscreen_rect().Contains(oInput->mousePosf) && OInputJustPressed(OMouse1)))
     {
         gameState.shared_state->is_fullscreen = !gameState.shared_state->is_fullscreen;
         oSettings->setBorderlessFullscreen(gameState.shared_state->is_fullscreen);
@@ -62,6 +71,9 @@ void update()
 void render()
 {
     gameState.menu_state->render();
+    oSpriteBatch->begin();
+    oSpriteBatch->drawRect(OGetTexture("fullscreen.png"), get_fullscreen_rect(), get_color_focus(get_fullscreen_rect()));
+    oSpriteBatch->end();
 }
 
 void postRender()
