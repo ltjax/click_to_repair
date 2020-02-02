@@ -204,12 +204,11 @@ void renderMachineFrames(entt::registry const& registry, Matrix const& camera)
 {
     auto frame = OGetTexture("frame.png");
     auto frame_size = frame->getSizef();
-    auto view = registry.view<Machine const, QualityStatus const>();
+    auto view = registry.view<Machine const>();
 
     for (auto entity : view)
     {
         auto const& machine = view.get<Machine const>(entity);
-        auto const& quality = view.get<QualityStatus const>(entity);
 
         auto rotation = 0.f;
         if (auto hover = registry.try_get<HoverState const>(entity); hover && hover->containsMouse)
