@@ -96,13 +96,18 @@ decltype(OGetTexture("")) icon_wrench;
 
 void renderCursor(GameState const& state)
 {
+    oInput->setMouseVisible(!state.is_repairing);
+
+    if (!state.is_repairing)
+        return;
+
     auto textureSize = icon_wrench->getSizef();
 
     const float targetSize = 96;
     oRenderer->renderStates.blendMode = OBlendAlpha;
     static float rot_time;
     auto s = std::sinf(state.repair_time * 7.f);
-    float rotation = state.is_repairing ? (s < 0 ? 1.f : -1.f) * (s*s) * 25.f : 0.f;
+    float rotation = (s < 0 ? 1.f : -1.f) * (s*s) * 25.f;
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
@@ -112,7 +117,6 @@ void renderCursor(GameState const& state)
 void Renderer::init()
 {
     icon_wrench = OGetTexture("wrench.png");
-    oInput->setMouseVisible(false);
 }
 
 void Renderer::run()
