@@ -40,6 +40,14 @@ void updateHamsters(LevelData& level, std::chrono::duration<float> dt)
     }
 }
 
+void updateFluxCapacitors(LevelData& level, std::chrono::duration<float> dt) {
+    auto view = level.entities.view<FluxCapacitor>();
+    for (auto entity : view)
+    {
+        auto& flux = view.get<FluxCapacitor>(entity);
+    }
+}
+
 void updateHamsterHiccups(LevelData& state, std::chrono::duration<float> dt)
 {
     using D = std::uniform_real_distribution<float>;
@@ -275,24 +283,11 @@ void updateGlobalQuality(LevelData& state, std::chrono::duration<float> dt)
 
 void updateGlobalQualitySound(LevelData& state, std::chrono::duration<float> dt)
 {
-    entt::registry& registry = state.entities;
-    auto view = registry.view<GlobalQualitySound>();
+    if (state.quality.current == Quality::Worst && state.quality.previous != Quality::Worst)
+        OPlaySound("engine_down.wav", 0.5f);
 
-    for (auto entity : view)
-    {
-        auto sound = view.get<GlobalQualitySound>(entity);
-
-        if (state.quality.current > state.quality.previous)
-        {
-            sound.positiveNotification->play();
-        }
-
-        if (state.quality.current < state.quality.previous)
-        {
-            sound.negativeNotification->play();
-        }
-    }
-
+    if (state.quality.current != Quality::Worst && state.quality.previous == Quality::Worst)
+        OPlaySound("engine_up.wav", 1.f);
 }
 
 void updateGearQuality(LevelData& state, std::chrono::duration<float> dt)
@@ -446,6 +441,7 @@ std::optional<GameFinished> Updater::run(std::chrono::duration<float> dt)
     updateGears(level, dt);
     updateEngines(level, dt);
     updateHamsters(level, dt);
+    updateFluxCapacitors(level, dt);
     updateHamsterHiccups(level, dt);
     updateHiccupEffects(registry);
     updateRepair(level, dt);

@@ -21,6 +21,12 @@ entt::entity createGear(entt::registry& registry, Vector2 position, float durabi
     return gear;
 }
 
+entt::entity createFluxCapacitor(entt::registry& registry, Vector2 position, float durability) {
+    auto flux = createPart(registry, position, durability, "flux_capacitor.wav");
+    registry.assign<FluxCapacitor>(flux);
+    return flux;
+}
+
 entt::entity createEngine(entt::registry& registry, Vector2 position, float durability)
 {
     auto engine = createPart(registry, position, durability, "ambient_machine1.wav");
@@ -34,15 +40,6 @@ entt::entity createHamster(entt::registry& registry, Vector2 position, float dur
     registry.assign<Hamster>(hamster);
     registry.assign<Hiccup>(hamster, "hiccup.wav");
     return hamster;
-}
-
-entt::entity createGlobalQualitySound(entt::registry& registry)
-{
-    auto entity = registry.create();
-    registry.assign<GlobalQualitySound>(entity, OCreateSoundInstance("positive_sound.wav"),
-            OCreateSoundInstance("negative_sound.wav"));
-
-    return entity;
 }
 
 void level0(entt::registry& registry, LevelData& state)
@@ -77,7 +74,7 @@ void level4(entt::registry& registry, LevelData& state)
     createGear(registry, Vector2(-x, y), 0.75f);
     createGear(registry, Vector2(x, -y), 0.75f);
     createHamster(registry, Vector2(x, y), 1.0f);
-    state.reparium_multiplier = 1.5f;
+    state.reparium_multiplier = 1.25f;
 }
 
 using LevelFunc = void (*)(entt::registry&, LevelData&);

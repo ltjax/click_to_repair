@@ -35,6 +35,10 @@ struct Engine
     float shake = 1.f;
 };
 
+struct FluxCapacitor
+{
+};
+
 struct HoverState
 {
     bool containsMouse = false;
@@ -45,13 +49,6 @@ struct HoverState
 struct HoverSound
 {
     OSoundInstanceRef background;
-};
-
-
-struct GlobalQualitySound
-{
-    OSoundInstanceRef positiveNotification;
-    OSoundInstanceRef negativeNotification;
 };
 
 enum class Quality

@@ -152,6 +152,23 @@ void renderGears(LevelData const& level, Matrix centerScreen)
     }
 }
 
+void renderFluxCapacitors(LevelData const& level, Matrix centerScreen)
+{
+    auto model = OGetModel("flux_capacitor.obj");
+    auto view = level.entities.view<Machine const, FluxCapacitor const>();
+    for (auto entity : view)
+    {
+        auto const& machine = view.get<Machine const>(entity);
+        auto boundsX = std::abs(model->getBoundingBox()->x);
+        auto scale = machine.size / (2.f * boundsX);
+        auto flux_box_transform =
+            Matrix::CreateScale(scale) * 
+            Matrix::CreateTranslation(machine.position - Vector2{ 0.f, -1.f * scale }) *
+            centerScreen;
+        renderMesh(model->getMesh(0), flux_box_transform);
+    }
+}
+
 Color colorForQuality(Quality quality)
 {
     auto color = OColorRGB(255, 255, 255);
@@ -309,6 +326,7 @@ void Renderer::run()
     renderGears(level, level.camera);
     renderEngines(level, level.camera);
     renderHamsters(level, level.camera);
+    renderFluxCapacitors(level, level.camera);
 
     oRenderer->renderStates.blendMode = OBlendPreMultiplied;
     oSpriteBatch->begin();
