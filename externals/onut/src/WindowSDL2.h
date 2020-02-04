@@ -27,7 +27,6 @@ namespace onut
 
     private:
         SDL_Window* m_pWindow = nullptr;
-        bool m_isFullScreen = false;
     };
 }
 

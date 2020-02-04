@@ -84,7 +84,7 @@ namespace onut
     {
         if (!m_pWindow) return;
 
-        SDL_SetWindowFullscreen(m_pWindow, isFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+        SDL_SetWindowFullscreen(m_pWindow, isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
     }
 
 
