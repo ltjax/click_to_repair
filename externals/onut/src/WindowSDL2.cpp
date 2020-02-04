@@ -80,6 +80,16 @@ namespace onut
         return m_pWindow;
     }
 
+    void WindowSDL2::setFullscreen(bool isFullscreen)
+    {
+        if (!m_pWindow) return;
+
+        // SDL_WINDOW_FULLSCREEN_DESKTOP would change the resolution
+        // dynamically, and game is not prepared for that yet 
+        SDL_SetWindowFullscreen(m_pWindow, isFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    }
+
+
     bool WindowSDL2::pollEvents()
     {
         if (!m_pWindow) return false;

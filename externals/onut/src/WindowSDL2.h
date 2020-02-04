@@ -20,12 +20,14 @@ namespace onut
         ~WindowSDL2();
 
         void setCaption(const std::string& newName) override;
+        void setFullscreen(bool isFullscreen) override;
         bool pollEvents() override;
 
         SDL_Window* getSDLWindow() const;
 
     private:
         SDL_Window* m_pWindow = nullptr;
+        bool m_isFullScreen = false;
     };
 }
 
