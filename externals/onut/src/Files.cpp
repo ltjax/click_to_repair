@@ -15,6 +15,9 @@
 #include <windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 #include "tinyfiledialogs/tinyfiledialogs.h"
 
@@ -234,7 +237,15 @@ namespace onut
         }
         return found;
     }
+#elif defined(__linux__) || defined(__APPLE__)
+    bool fileExists(const std::string& filename)
+    {
+        struct stat buf;
+        return (stat(filename.c_str(), &buf)==0);
+    }
+#endif
     
+#if defined(WIN32)
     std::string showOpenDialog(const std::string& caption, const FileTypes& extensions, const std::string& defaultFilename)
     {
         auto windowHandle = oWindow->getHandle();

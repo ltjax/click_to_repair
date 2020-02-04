@@ -14,7 +14,6 @@ void SharedState::load()
 {
     progress = {}; // reset to defaults just in case
 
-#if defined(WIN32)
     if (onut::fileExists(save_file))
     {
         auto json = nlohmann::json::parse(onut::getFileData(save_file));
@@ -25,9 +24,6 @@ void SharedState::load()
         get(progress.next_available_level, key_next_level);
         get(is_fullscreen, key_is_fullscreen);
     }
-#else
-    progress.next_available_level = Constants::MAX_LEVELS(); // congratulations!
-#endif
 }
 
 void SharedState::save()
