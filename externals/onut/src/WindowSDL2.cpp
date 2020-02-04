@@ -84,8 +84,6 @@ namespace onut
     {
         if (!m_pWindow) return;
 
-        // SDL_WINDOW_FULLSCREEN_DESKTOP would change the resolution
-        // dynamically, and game is not prepared for that yet 
         SDL_SetWindowFullscreen(m_pWindow, isFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
     }
 
