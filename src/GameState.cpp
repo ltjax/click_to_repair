@@ -2,6 +2,7 @@
 #include "Constants.hpp"
 #include <onut/Files.h>
 #include <nlohmann/json.hpp>
+#include <filesystem>
 
 namespace {
     constexpr auto save_file = "savegame.json";
@@ -14,7 +15,8 @@ void SharedState::load()
 {
     progress = {}; // reset to defaults just in case
 
-    if (onut::fileExists(save_file))
+    std::error_code ec;
+    if (std::filesystem::exists(save_file, ec))
     {
         auto json = nlohmann::json::parse(onut::getFileData(save_file));
         auto get = [&json](auto& var, auto name) {

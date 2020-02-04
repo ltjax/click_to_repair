@@ -40,5 +40,6 @@ set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 17)
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   target_link_libraries(${TARGET_NAME} 
       PUBLIC dl
+      PUBLIC stdc++fs
   )
 endif()
