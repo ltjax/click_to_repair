@@ -89,6 +89,10 @@ Screen::Factory MainMenuScreen::update(std::chrono::duration<float> dt)
 void MainMenuScreen::render()
 {
   oRenderer->clear(Constants::BackgroundColor());
+
+
+  //drawCircle(OScreenCenterf, Color::White, 100.f, true);
+
   oSpriteBatch->begin();
   {
     auto icon_wrench = OGetTexture("mouse.png");
@@ -99,9 +103,7 @@ void MainMenuScreen::render()
       Color::White, 0.f,  targetSize / textureSize.x, onut::Align::Center);
     if (anim_mouse_ > 0.f)
     {
-      auto icon_press = OGetTexture("white_dot.png");
-      oSpriteBatch->drawSprite(icon_press, pos + Vector2(-targetSize / 10.f, -targetSize / 15.f),
-        Color::White, 0.f, 2.f, onut::Align::Center);
+        drawCircle(pos + Vector2(-targetSize / 10.f, -targetSize / 15.f), Color::White, 20, true);
     }
   }
   {

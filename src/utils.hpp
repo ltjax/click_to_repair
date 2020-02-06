@@ -2,6 +2,7 @@
 #include <onut/Vector4.h>
 #include <onut/Color.h>
 #include <onut/Input.h>
+#include <onut/PrimitiveBatch.h>
 
 inline Rect enlargeRect(Rect input, Vector2 size)
 {
@@ -27,4 +28,36 @@ inline Rect get_fullscreen_rect()
 {
   Vector2 size(96);
   return { 0, 0, size };
+}
+
+inline void drawCircle(Vector2 center, Color color, float radius, bool fill, int segments = 32)
+{
+    oPrimitiveBatch->begin(fill ? OPrimitiveTriangleList :OPrimitiveLineStrip);
+
+    if (!fill)
+    {
+        for (auto i=0; i <= segments; ++i)
+        {
+            auto x = i*2*M_PI/segments;
+            auto v = radius * Vector2(cos(x), sin(x)) + center;
+
+            oPrimitiveBatch->draw(v,color);
+        }
+    } 
+    else 
+    {
+        for (auto i=0; i < segments; ++i)
+        {
+            auto x1 = i*2*M_PI/segments;
+            auto x2 = (i+1)*2*M_PI/segments;
+            auto v1 = radius * Vector2(cos(x1), sin(x1)) + center;
+            auto v2 = radius * Vector2(cos(x2), sin(x2)) + center;
+
+            oPrimitiveBatch->draw(center,color);
+            oPrimitiveBatch->draw(v1,color);
+            oPrimitiveBatch->draw(v2,color);
+        }
+    }
+
+    oPrimitiveBatch->end();
 }
