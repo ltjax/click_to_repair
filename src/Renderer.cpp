@@ -318,24 +318,24 @@ void renderQualityLights(LevelData const& state)
 {
     auto padding = 100.f;
     auto radius = 30.f;
-    auto stroke = 4.f;
+    auto stroke = 3.f;
 
     auto offset = Vector2{ padding, 0.f };
-    Vector2 positionCenter{ OScreenCenterXf , padding}; 
+    Vector2 positionCenter{ OScreenCenterXf , padding/2}; 
     Vector2 positionLeft = positionCenter - offset;
     Vector2 positionRight = positionCenter + offset;
 
     auto quality = state.quality.current;
 
-    struct { Vector2 position; Color color; } lights[]{
-        {positionLeft, quality == Quality::Worst ? OColorRGB(255, 0, 0) : OColorRGB(96, 96, 96)},
-        {positionCenter, quality == Quality::Medium ? OColorRGB(255, 255, 0) : OColorRGB(96, 96, 96)},
-        {positionRight, quality == Quality::Good ? OColorRGB(0, 255, 0) : OColorRGB(96, 96, 96)}
+    struct { Vector2 position; bool on; Color color; } lights[]{
+        {positionLeft, quality == Quality::Worst, OColorRGB(255, 0, 0)},
+        {positionCenter, quality == Quality::Medium, OColorRGB(255, 255, 0)},
+        {positionRight, quality == Quality::Good, OColorRGB(0, 255, 0)}
     };
 
     for (auto const& each : lights)
     {
-        drawCircleFill(each.position, each.color, radius);
+        if (each.on) drawCircleFill(each.position, each.color, radius);
         drawCircle(each.position, Color::White, radius, stroke);
     }
 }
