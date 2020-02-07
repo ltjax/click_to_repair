@@ -148,7 +148,7 @@ void MainMenuScreen::render()
         oSpriteBatch->drawRect(nullptr, small_rect, color);
       }
       else {
-        color = Color{ 0.5f, 0.5f, 0.5f, 1.f };
+        color = Color::White;
       }
       oSpriteBatch->drawOutterOutlineRect(rect, 5.f, color);
     }
