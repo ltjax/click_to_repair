@@ -90,9 +90,6 @@ void MainMenuScreen::render()
 {
   oRenderer->clear(Constants::BackgroundColor());
 
-
-  //drawCircle(OScreenCenterf, Color::White, 100.f, true);
-
   oSpriteBatch->begin();
   {
     auto icon_wrench = OGetTexture("mouse.png");
@@ -103,7 +100,7 @@ void MainMenuScreen::render()
       Color::White, 0.f,  targetSize / textureSize.x, onut::Align::Center);
     if (anim_mouse_ > 0.f)
     {
-        drawCircle(pos + Vector2(-targetSize / 10.f, -targetSize / 15.f), Color::White, 20, true);
+        drawCircleFill(pos + Vector2(-targetSize / 10.f, -targetSize / 15.f), Color::White, 20.f);
     }
   }
   {
@@ -158,8 +155,6 @@ void MainMenuScreen::render()
   }
 
   {
-    auto texture_connect = OGetTexture("white_dot.png");
-    auto texture_connect_next = OGetTexture("quality_circle.png");
     const auto size_per_level = OScreenWf / Constants::MAX_LEVELS();
     auto padding = 32.f;
     auto offset = Vector2{ padding, 0.f };
@@ -168,14 +163,18 @@ void MainMenuScreen::render()
     for (int level = 0, level_end = std::min(progress.next_available_level, Constants::MAX_LEVELS()-1); level < level_end; ++level)
     {
       auto rect = get_level_box(level);
-      auto connect = level == progress.next_available_level -1 ? texture_connect_next : texture_connect;
       Vector2 connect_pos = rect.Right() + offset;
       auto stop = (get_level_box(level + 1).Left() - offset).x;
       auto dist = stop - connect_pos.x;
       auto num_dots = std::min(3, static_cast<int>(dist / padding));
       connect_pos.x+= (dist - num_dots * padding) / 2.f + padding / 2.f;
       for (int dot = 0; dot < num_dots; ++dot)
-        oSpriteBatch->drawSprite(connect, connect_pos + offset * dot, Color::White, onut::Align::Center);
+      {
+        if (level == progress.next_available_level -1 )
+            drawCircleFill(connect_pos+offset*dot, Color::White, 10.f);
+        else
+            drawCircle(connect_pos+offset*dot, Color::White, 10.f, 4.f);
+      }
     }
   }
 
