@@ -26,7 +26,7 @@ struct Machine
 
 struct Gear
 {
-    Matrix rotation;
+    float rotation = 0.f;
     float delta = 0.f;
 };
 

@@ -144,13 +144,13 @@ void renderGears(LevelData const& level, Matrix centerScreen)
         auto scale = machine.size / (2.f * boundsX);
         auto small_wheel_transform =
             Matrix::CreateScale(scale) *
-            gear.rotation *
+            Matrix::CreateRotationZ(gear.rotation) *
             Matrix::CreateTranslation(machine.position - Vector2{ 1.2f, -0.5f } * scale) *
             centerScreen;
         
         auto large_wheel_transform =
             Matrix::CreateScale(scale) *
-            gear.rotation.Invert() *
+            Matrix::CreateRotationZ(Constants::GEAR_RATIO*gear.rotation) *
             Matrix::CreateTranslation(machine.position - Vector2{-2.f, -0.5f} * scale) *
             centerScreen;
 

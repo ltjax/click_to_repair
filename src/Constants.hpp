@@ -12,6 +12,7 @@ namespace Constants
     inline constexpr auto REPAIR_UP_FRONT_COST = 0.05f;
 
     inline constexpr auto GEAR_WEAR_PER_SECOND = 0.070f;
+    inline constexpr auto GEAR_RATIO = -17.f/9.f;
     inline constexpr auto ENGINE_WEAR_PER_SECOND_SHAKING = 0.3f;
     inline constexpr auto ENGINE_WEAR_PER_SECOND = 0.05f;
     inline constexpr auto ENGINE_SHAKE_DURATION = std::chrono::milliseconds(1200);

@@ -15,7 +15,8 @@ void updateGears(LevelData& level, std::chrono::duration<float> dt)
     for (auto entity : view)
     {
         auto& gear = view.get<Gear>(entity);
-        gear.rotation = Matrix::CreateRotationZ(level.animation_factor * dt.count()) * gear.rotation;
+        gear.rotation += level.animation_factor * dt.count();
+        while (gear.rotation>2*M_PI) gear.rotation -= 2*M_PI;
         gear.delta += dt.count();
     }
 }
