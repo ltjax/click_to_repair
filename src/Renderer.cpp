@@ -369,9 +369,7 @@ void renderCursor(LevelData const& state)
     auto textureSize = icon_wrench->getSizef();
 
     const float targetSize = 192;
-    static float rot_time;
-    auto s = std::sin(state.repair_time * 7.f);
-    float rotation = (s < 0 ? 1.f : -1.f) * (s * s) * 25.f;
+    float rotation = -30.f * std::cos(state.repair_time * 12.f);
     oSpriteBatch->drawSprite(icon_wrench,
         oInput->mousePosf,
         Color::White, rotation, targetSize / textureSize.x,
